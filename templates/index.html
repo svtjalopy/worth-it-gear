@@ -9,22 +9,26 @@
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-    }
+  background: url("{{ url_for('static', filename='images/backgrounds/fairway_morning.png') }}") no-repeat center center fixed;
+  background-size: cover;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
 
     header {
-      background-color: #f2f2f2;
-      color: #222;
-      padding: 1em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+  background-color: rgba(255, 255, 255, 0.40);
+  color: #222;
+  padding: 1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* optional soft shadow */
+}
+
 
     .logo {
       height: 120px;
@@ -205,6 +209,7 @@ function filterProducts(category, button) {
 </head>
 
 <body>
+<div style="background-color: rgba(255,255,255,0.10); min-height: 100vh;">
   <header>
     <img src="{{ url_for('static', filename='images/logo_worthitgear.png') }}" alt="Worth It Gear Logo" class="logo">
     <div class="search-container">
@@ -976,6 +981,7 @@ function filterProducts(category, button) {
     Affiliate notice: As an Amazon Associate, we may earn from qualifying purchases — at no extra cost to you.<br />
     &copy; 2025 Worth It Gear
   </footer>
+</div>
 </body>
 </html>
 
