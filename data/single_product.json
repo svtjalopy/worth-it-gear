@@ -1,0 +1,11 @@
+
+
+{
+  "title": "Garmin Fish Finder",
+  "price": "$199.99",
+  "store": "Amazon",
+  "rating": 4.6,
+  "image": "/assets/images/fishfinder.jpg",
+  "link": "https://amzn.to/example",
+  "review_summary": "Crystal-clear sonar. Easy install. Missing GPS."
+}

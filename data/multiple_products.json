@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Garmin Fish Finder",
+    "price": "$199.99",
+    "store": "Amazon",
+    "rating": 4.6,
+    "image": "/assets/images/fishfinder.jpg",
+    "link": "https://amzn.to/garmin",
+    "review_summary": "Crystal-clear sonar. Easy install. Missing GPS."
+  },
+  {
+    "title": "Minn Kota Trolling Motor",
+    "price": "$849.00",
+    "store": "Walmart",
+    "rating": 4.8,
+    "image": "/assets/images/minnkota.jpg",
+    "link": "https://walmart.com/minnkota",
+    "review_summary": "Super quiet, powerful, and battery efficient."
+  }
+]
