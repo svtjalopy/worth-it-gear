@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Updated daily. Real-world picks of the Amazon Basics tools and gadgets that actually deliver." />
-  <title>Top Amazon Basics Products | Worth It Gear</title>
+  <meta name="description" content="Not all golf balls are created equal. Some fly farther. Some stop faster. Some just save you money. Whether you’re chasing distance off the tee or feel around the green, the right ball makes a difference. We tested the top picks to find out which ones are actually worth your money — and which ones fall short.">
+  <title>Top Golf Balls of 2025 for Your Budget | Worth It Gear</title>
   <link rel="icon" href="/assets/images/favicon.png" />
 
   <style>
@@ -70,14 +70,14 @@
     }
 
     .product-card {
-      background-color: white;
+      background: #fff;
       border: 1px solid #ccc;
       border-radius: 8px;
       padding: 1em;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    .product-card img {
+    .product-image {
       max-width: 100%;
       height: 200px;
       object-fit: contain;
@@ -85,41 +85,87 @@
     }
 
     .product-title {
-      font-size: 1.2em;
-      margin: 0.5em 0;
+      font-size: 1.4em;
+      margin-top: 0.6em;
     }
 
-    .product-store,
-    .product-price,
-    .product-summary {
-      margin: 0.5em 0;
+    .gear-rating {
+      margin: 0.4em 0;
     }
 
-    .product-rating span {
-      margin-right: 4px;
+    .gear-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 2px;
+    }
+
+    .summary-preview {
+      font-size: 1em;
+      color: #333;
+    }
+
+    .expand-btn {
+      margin-top: 0.6em;
+      padding: 0.5em 1em;
+      background-color: #ff9900;
+      border: none;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .product-details {
+      margin-top: 1em;
+      border-top: 1px solid #eee;
+      padding-top: 1em;
+      font-size: 0.95em;
     }
 
     .buy-button {
       display: inline-block;
-      margin-top: 12px;
-      padding: 8px 16px;
-      background-color: #ff9900;
+      margin-top: 0.8em;
+      background-color: #0073bb;
       color: white;
       text-decoration: none;
+      padding: 0.6em 1.2em;
       border-radius: 6px;
       font-weight: bold;
     }
 
     .buy-button:hover {
-      background-color: #e68a00;
+      background-color: #005fa3;
     }
 
     footer {
-      text-align: center;
-      padding: 2em;
-      font-size: 0.9em;
-      color: #666;
-    }
+  text-align: center;
+  padding: 2em;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.filter-btn {
+  background-color: #003366;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  margin: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.filter-btn:hover {
+  background-color: #005fa3;
+}
+
+#filter-active {
+  background-color: #0099ff;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+
   </style>
 
   <script>
@@ -131,6 +177,30 @@
         card.style.display = title.includes(input) ? "block" : "none";
       });
     }
+
+    function toggleDetails(button) {
+  const details = button.nextElementSibling;
+  const isHidden = details.style.display === "none";
+  details.style.display = isHidden ? "block" : "none";
+  button.textContent = isHidden ? "Hide Summary" : "Read Full Summary";
+}
+
+// ✅ Now define filterProducts outside of toggleDetails
+function filterProducts(category, button) {
+  const cards = document.querySelectorAll(".product-card");
+  cards.forEach(card => {
+    const cardCategory = card.getAttribute("data-category");
+    card.style.display = (category === 'all' || cardCategory === category) ? "block" : "none";
+  });
+
+  // Handle active button styling
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.removeAttribute("id");
+  });
+  button.setAttribute("id", "filter-active");
+}
+
+
   </script>
 </head>
 
@@ -139,121 +209,592 @@
     <img src="{{ url_for('static', filename='images/logo_worthitgear.png') }}" alt="Worth It Gear Logo" class="logo">
     <div class="search-container">
       <input type="text" id="productSearch" placeholder="Search products..." />
-      <button onclick="searchProducts()">Verified Worth It</button>
+      <button onclick="searchProducts()">Search Worth It</button>
     </div>
   </header>
 
   <section class="intro">
-    <h2>The Best Amazon Basics Products (Actually Worth the Money)</h2>
-    <p>Not all Amazon Basics gear is created equal — but some still punches way above its price.
-    This site is a hand-picked list of products that we've either personally used or deeply researched through reviews and performance.</p>
+    <h2>Top Golf Balls of 2025 for Your Budget</h2>
+    <p>
+      Not all golf balls are created equal. Some fly farther. Some stop faster. Some just save you money.
+      Whether you’re chasing distance off the tee or feel around the green, the right ball makes a difference.
+      We tested the top picks to find out which ones are actually worth your money — and which ones fall short.
+    </p>
     <p>This page is updated daily to ensure pricing, availability, and ratings are current, so you're only seeing the best value options at any given time.</p>
   </section>
+<div class="filter-buttons" style="text-align: center; margin-top: 2em;">
+<button class="filter-btn" onclick="filterProducts('all', this)">All Balls</button>
+<button class="filter-btn" onclick="filterProducts('top-tier', this)">Top Tier</button>
+<button class="filter-btn" onclick="filterProducts('best-overall', this)">Best Overall</button>
+<button class="filter-btn" onclick="filterProducts('budget', this)">Budget</button>
+
+
+</div>
 
   <section class="products">
-    <!-- Product 1 -->
-    <!-- Product Card for TaylorMade Qi10 Max Driver -->
-<div class="product-card">
-  <!-- Image & Title -->
-  <img src="https://dks.scene7.com/is/image/GolfGalaxy/23TYMMTM24MXDRVSPDRV?qlt=70&wid=1100&hei=1100&fmt=webp&op_sharpen=1&fit=constrain" alt="TaylorMade Qi10 Max Driver" class="product-image">
-  <h2 class="product-title">TaylorMade Qi10 Max Driver</h2>
+  <!-- Pro V1 - Top Tier -->
+  <div class="product-card" data-category="top-tier">
+    <img src="{{ url_for('static', filename='images/golf/balls/prov1.jpg') }}" alt="Titleist Pro V1" class="product-image">
+    <h2 class="product-title">Titleist Pro V1</h2>
+    <div class="gear-rating">
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    </div>
+    <p><strong>Highlights:</strong>Tour-level spin, control, and consistency trusted by pros.</p>
+    <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+    <div class="product-details" style="display: none;">
+      <p><strong>WorthIt Rating:</strong> 9.5 / 10</p>
+      <p><strong>Worthit Summary:</strong> Incredible performance off the tee and around the green. The gold standard for serious players.</p>
+      <h4>Performance Highlights:</h4>
+<table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Extremely high (Tour-level)</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Feel:</strong></td><td>Soft but responsive</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Compression:</strong></td><td>~90</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>Penetrating, consistent</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Low–mid handicaps / Tour-level</td></tr>
+</table>
 
-  <!-- Gear Rating (Visual Summary) -->
-  <div class="gear-rating">
-    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon">
-    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon">
-    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon">
-    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon">
-    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon">
+      <a href="https://www.amazon.com/dp/B08JZ3LZGH" target="_blank" class="buy-button">Buy on Amazon</a>
+    </div>
   </div>
-
-  <!-- Short Summary Preview -->
-  <p class="summary-preview">
-    Forgiveness, distance, and confidence off the tee — now in a driver that finally lives up to the hype.
-  </p>
-
-  <!-- Expand Button -->
+    <!-- Titleist PRO V1x -->
+<div class="product-card" data-category="top-tier">
+  <img src="{{ url_for('static', filename='images/golf/balls/prov1x.jpg') }}" alt="Titleist Pro V1x" class="product-image">
+  <h2 class="product-title">Titleist Pro V1x</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+  </div>
+  <p><strong>Highlights:</strong>Higher flight, firmer feel, and even more distance than the Pro V1.</p>
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-
-  <!-- Hidden Expanded Section -->
   <div class="product-details" style="display: none;">
-    <p><strong>WorthIt Rating:</strong> 9.3 / 10</p>
-    <p><strong>Review Summary:</strong><br>
-      According to over 1,800 verified buyers, the Qi10 Max Driver is a standout for its consistency, forgiveness, and distance gains.
-      Users praised its low-spin launch and tight dispersion, especially on off-center hits. Some noted that it's not the longest driver on the market,
-      but one of the most predictable — making it perfect for golfers focused on accuracy and shot shape. Sound and feel are also major wins.
-    </p>
-    <a href="https://www.amazon.com/dp/B0CQ5K7X9H" target="_blank" class="buy-button">Buy on Amazon</a>
+    <p><strong>WorthIt Rating:</strong> 9.4 / 10</p>
+    <p><strong>Worthit Summary:</strong> Great for players who want a high launch and a firmer feel while keeping that reliable Tour-level spin.</p>
+    <h4>Performance Highlights:</h4>
+<table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Extremely high</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Feel:</strong></td><td>Firmer than Pro V1</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Compression:</strong></td><td>~100</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>Higher launch, longer carry</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Faster swingers / Need max distance + spin</td></tr>
+</table>
+
+
+    <a href="https://www.amazon.com/dp/B08JZ4HJ8W" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
 
-<style>
-.product-card {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 1em;
-  max-width: 600px;
-  margin: 1em auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.product-image {
-  max-width: 100%;
-  border-radius: 6px;
-}
-.product-title {
-  font-size: 1.4em;
-  margin-top: 0.6em;
-}
-.gear-rating {
-  margin: 0.4em 0;
-}
-.gear-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 2px;
-}
-.summary-preview {
-  font-size: 1em;
-  color: #333;
-}
-.expand-btn {
-  margin-top: 0.6em;
-  padding: 0.5em 1em;
-  background-color: #ff9900;
-  border: none;
-  color: #fff;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.product-details {
-  margin-top: 1em;
-  border-top: 1px solid #eee;
-  padding-top: 1em;
-  font-size: 0.95em;
-}
-.buy-button {
-  display: inline-block;
-  margin-top: 0.8em;
-  background-color: #0073bb;
-  color: white;
-  text-decoration: none;
-  padding: 0.6em 1.2em;
-  border-radius: 6px;
-  font-weight: bold;
-}
-</style>
+  <!-- Tour Response - Best Overall -->
+  <div class="product-card" data-category="best-overall">
+    <img src="{{ url_for('static', filename='images/golf/balls/tour_response.jpg') }}" alt="TaylorMade Tour Response" class="product-image">
+    <h2 class="product-title">TaylorMade Tour Response</h2>
+    <div class="gear-rating">
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    </div>
+    <p><strong>Highlights:</strong>Tour-quality feel and performance at a mid-tier price.</p>
+    <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+    <div class="product-details" style="display: none;">
+      <p><strong>WorthIt Rating:</strong> 8.8 / 10</p>
+      <p><strong>Worthit Summary:</strong> Great value for players looking for premium features without paying premium prices.</p>
+      <h4>Performance Highlights:</h4>
+<table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Good spin for the price</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Feel:</strong></td><td>Soft, urethane Tour-like feel</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Compression:</strong></td><td>~70</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>High launch, easy to hit</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Mid-handicaps who want control & feel</td></tr>
+</table>
 
-<script>
-function toggleDetails(button) {
-  const details = button.nextElementSibling;
-  const isHidden = details.style.display === "none";
-  details.style.display = isHidden ? "block" : "none";
-  button.textContent = isHidden ? "Hide Summary" : "Read Full Summary";
-}
-</script>
 
-  </section>
+      <a href="https://www.amazon.com/dp/B082VZ86JZ" target="_blank" class="buy-button">Buy on Amazon</a>
+    </div>
+  </div>
+    <!-- TaylorMade TP5 -->
+<div class="product-card" data-category="top-tier">
+  <img src="{{ url_for('static', filename='images/golf/balls/tp5.jpg') }}" alt="TaylorMade TP5" class="product-image">
+  <h2 class="product-title">TaylorMade TP5</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+  </div>
+  <p><strong>Highlights:</strong>5-layer performance with excellent spin and feel on wedges and irons.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 9.0 / 10</p>
+    <p><strong>Worthit Summary:</strong> Slightly softer than TP5x, with better greenside control. A favorite among players who want touch and versatility.</p>
+    <h4>Performance Highlights:</h4>
+<table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Very high, especially greenside</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Feel:</strong></td><td>Slightly soft Tour feel</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Compression:</strong></td><td>~85</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>Mid-launch, controllable</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Advanced players wanting workability</td></tr>
+</table>
+
+    <a href="https://www.amazon.com/dp/B081TVT8CJ" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+
+  <!-- Callaway Supersoft - Budget -->
+  <div class="product-card" data-category="budget">
+    <img src="{{ url_for('static', filename='images/golf/balls/supersoft.jpg') }}" alt="Callaway Supersoft" class="product-image">
+    <h2 class="product-title">Callaway Supersoft</h2>
+    <div class="gear-rating">
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+      <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    </div>
+    <p><strong>Highlights:</strong>Ultra-soft feel and good distance at a great price point.</p>
+    <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+    <div class="product-details" style="display: none;">
+      <p><strong>WorthIt Rating:</strong> 8.2 / 10</p>
+      <p><strong>Worthit Summary:</strong> Excellent for beginners or anyone who wants soft feel and straight shots on a budget.</p>
+      <h4>Performance Highlights:</h4>
+<table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Low</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Feel:</strong></td><td>Very soft</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Compression:</strong></td><td>~38</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>High launch, straight flight</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>High handicaps / seniors / slow swings</td></tr>
+</table>
+
+      <a href="https://www.amazon.com/dp/B07NDZ3K9R" target="_blank" class="buy-button">Buy on Amazon</a>
+    </div>
+  </div>
+    <!--Callaway ChromeSoft-->
+<div class="product-card" data-category="best-overall">
+  <img src="{{ url_for('static', filename='images/golf/balls/chromesoft.jpg') }}" alt="Callaway Chrome Soft" class="product-image">
+  <h2 class="product-title">Callaway Chrome Soft</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+  </div>
+  <p><strong>Highlights:</strong>Tour performance in a softer, more forgiving package.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.7 / 10</p>
+    <p><strong>Worthit Summary:</strong> Ideal for golfers who want control and feel but don’t swing like the pros. Great mix of softness and spin.</p>
+    <h4>Performance Highlights:</h4>
+<table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Moderate to high</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Feel:</strong></td><td>Very soft</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Compression:</strong></td><td>~75–80</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>High launch, straighter shots</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Mid–high handicaps wanting a Tour feel</td></tr>
+</table>
+
+    <a href="https://www.amazon.com/dp/B08HSN1T54" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+    <!--Srixon Q-Star Tour-->
+<div class="product-card" data-category="best-overall">
+  <img src="{{ url_for('static', filename='images/golf/balls/qstar.jpg') }}" alt="Srixon Q-Star Tour" class="product-image">
+  <h2 class="product-title">Srixon Q-Star Tour</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+  </div>
+  <p><strong>Highlights:</strong>Urethane cover and tour-level features, without the price tag.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.6 / 10</p>
+    <p><strong>Worthit Summary:</strong> Lower compression makes this a strong option for moderate swing speeds. Great feel and spin at a mid-range price.</p>
+    <h4>Performance Highlights:</h4>
+<table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Good spin, especially for price</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Feel:</strong></td><td>Soft feel</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Compression:</strong></td><td>~72</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>Mid-high, very stable</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Moderate swing speeds, casual players</td></tr>
+</table>
+
+    <a href="https://www.amazon.com/dp/B08R6ZTG4C" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+    <!--Srixon Soft Feel-->
+<div class="product-card" data-category="budget">
+  <img src="{{ url_for('static', filename='images/golf/balls/softfeel.jpg') }}" alt="Srixon Soft Feel" class="product-image">
+  <h2 class="product-title">Srixon Soft Feel</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
+  </div>
+  <p><strong>Highlights:</strong>Beginner-friendly feel and flight for high handicappers and seniors.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.3 / 10</p>
+    <p><strong>Worthit Summary:</strong> Excellent option for players who prioritize feel and forgiveness. Easy launch and surprisingly soft around the greens.</p>
+    <h4>Performance Highlights:</h4>
+<table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Low to moderate</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Feel:</strong></td><td>Very soft</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Compression:</strong></td><td>~60</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>Mid-high launch</td></tr>
+  <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Beginners and slower swingers</td></tr>
+</table>
+
+    <a href="https://www.amazon.com/dp/B07X8GX9XY" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+
+<!-- Noodle Long & Soft - Budget -->
+<div class="product-card" data-category="budget">
+  <img src="{{ url_for('static', filename='images/golf/balls/noodle.jpg') }}" alt="Noodle Long & Soft" class="product-image">
+  <h2 class="product-title">Noodle Long & Soft</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Soft feel, easy distance, and budget-friendly for weekend play.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 7.9 / 10</p>
+    <p><strong>Worthit Summary:</strong> A classic choice for casual players or high handicaps. Easy to launch and surprisingly soft around the greens given the price.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Low</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Very soft</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~34</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>High launch, long carry</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Beginners, seniors, high handicaps</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B00AZ0IBKE" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Vice Pro - Best Overall -->
+<div class="product-card" data-category="best-overall">
+  <img src="{{ url_for('static', filename='images/golf/balls/vicepro.jpg') }}" alt="Vice Pro" class="product-image">
+  <h2 class="product-title">Vice Pro</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Tour-level design with direct-to-consumer pricing. Great control for the cost.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.9 / 10</p>
+    <p><strong>Worthit Summary:</strong> Performs surprisingly well across the bag. Excellent spin and feel for the price. Best value when bought in bulk direct.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>High</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Medium-soft</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~85</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Mid-launch, workable flight</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Mid to low handicaps looking for value</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B07PW3MLH9" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Kirkland Signature - Budget -->
+<div class="product-card" data-category="budget">
+  <img src="{{ url_for('static', filename='images/golf/balls/kirkland.jpg') }}" alt="Kirkland Signature" class="product-image">
+  <h2 class="product-title">Kirkland Signature</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Surprisingly good Tour ball performance for bulk-buy pricing.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.5 / 10</p>
+    <p><strong>Worthit Summary:</strong> Known for outstanding short game spin and a soft feel, especially for the price. Some inconsistency noted between batches.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Very high</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Soft</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~85</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Mid-high, controllable</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Budget-conscious players who want spin</td></tr>
+    </table>
+    <a href="https://www.costco.com" target="_blank" class="buy-button">Buy at Costco</a>
+  </div>
+</div>
+<!-- Maxfli Tour - Best Overall -->
+<div class="product-card" data-category="best-overall">
+  <img src="{{ url_for('static', filename='images/golf/balls/maxfli_tour.jpg') }}" alt="Maxfli Tour" class="product-image">
+  <h2 class="product-title">Maxfli Tour</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>High-end feel and strong short game performance for less than $40/dozen.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.7 / 10</p>
+    <p><strong>Worthit Summary:</strong> Great alternative to Tour-level balls at a better price. Consistent distance and spin, with excellent durability.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>High</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Firm but responsive</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~90</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Penetrating with good control</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Mid to low handicaps looking for Tour feel without Tour price</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B08MNSDWGR" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Bridgestone e6 - Budget -->
+<div class="product-card" data-category="budget">
+  <img src="{{ url_for('static', filename='images/golf/balls/e6.jpg') }}" alt="Bridgestone e6" class="product-image">
+  <h2 class="product-title">Bridgestone e6</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Straight flight, soft feel, and great value for mid-to-high handicaps.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.4 / 10</p>
+    <p><strong>Worthit Summary:</strong> Reliable and easy to launch. Known for helping players reduce slices and gain confidence off the tee without breaking the bank.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Low to moderate</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Very soft</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~50</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Straight, mid-high launch</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Mid-to-high handicaps / Slice-prone players</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B09S3X3SVC" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Titleist Tour Soft - Best Overall -->
+<div class="product-card" data-category="best-overall">
+  <img src="{{ url_for('static', filename='images/golf/balls/toursoft.jpg') }}" alt="Titleist Tour Soft" class="product-image">
+  <h2 class="product-title">Titleist Tour Soft</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Premium soft feel with big brand consistency and moderate spin.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.6 / 10</p>
+    <p><strong>Worthit Summary:</strong> Well-rounded ball that feels soft but still performs across the bag. Great pick for players who want consistency without going full Tour.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Moderate</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Very soft</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~65</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Mid-high, smooth trajectory</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Mid-handicaps who want feel and control</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B08NVY1XXS" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Wilson Triad - Best Overall -->
+<div class="product-card" data-category="best-overall">
+  <img src="{{ url_for('static', filename='images/golf/balls/triad.jpg') }}" alt="Wilson Triad" class="product-image">
+  <h2 class="product-title">Wilson Triad</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Engineered for consistency. Strong spin, soft feel, and low driver dispersion.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.7 / 10</p>
+    <p><strong>Worthit Summary:</strong> Performs like a tour ball without tour pricing. Ideal for players who want tighter dispersion and balanced performance throughout the round.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>High</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Soft</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~85</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Mid-launch, tight dispersion</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Mid-to-low handicaps looking for control</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B09MRYCJTZ" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Callaway ERC Soft - Best Overall -->
+<div class="product-card" data-category="best-overall">
+  <img src="{{ url_for('static', filename='images/golf/balls/ercsoft.jpg') }}" alt="Callaway ERC Soft" class="product-image">
+  <h2 class="product-title">Callaway ERC Soft</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Soft, long, and packed with triple track alignment help.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.6 / 10</p>
+    <p><strong>Worthit Summary:</strong> Offers solid feel and distance with bonus features like alignment aid. A fan favorite for casual players who like tech on a budget.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Moderate</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Soft</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~60</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>High launch, straight</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Mid-handicaps, alignment-focused players</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B08P2DXXKP" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- TaylorMade TP5x - Top Tier -->
+<div class="product-card" data-category="top-tier">
+  <img src="{{ url_for('static', filename='images/golf/balls/tp5x.jpg') }}" alt="TaylorMade TP5x" class="product-image">
+  <h2 class="product-title">TaylorMade TP5x</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Tour-level distance and control for high-speed players.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 9.1 / 10</p>
+    <p><strong>Worthit Summary:</strong> A favorite among aggressive swingers looking for a slightly firmer feel, piercing ball flight, and strong iron spin. Great for shaping shots and staying long off the tee.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Very high, especially on full shots</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Firm Tour feel</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~97</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>High launch, low spin off driver</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Low handicaps / High-speed players</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B081TVX16S" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Srixon Z-Star - Top Tier -->
+<div class="product-card" data-category="top-tier">
+  <img src="{{ url_for('static', filename='images/golf/balls/zstar.jpg') }}" alt="Srixon Z-Star" class="product-image">
+  <h2 class="product-title">Srixon Z-Star</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Tour control and bite with a softer feel than most premium balls.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.9 / 10</p>
+    <p><strong>Worthit Summary:</strong> Known for incredible spin on approach shots and a surprisingly soft feel. Great for shaping shots and sticking the green — especially for players who don’t love a harsh-feeling Tour ball.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Extremely high, especially on wedges</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Soft Tour feel</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~90</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Mid-high launch, workable</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Low-to-mid handicaps who want max greenside control</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B08SJ26W4W" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Bridgestone Tour B X - Top Tier -->
+<div class="product-card" data-category="top-tier">
+  <img src="{{ url_for('static', filename='images/golf/balls/tourbx.jpg') }}" alt="Bridgestone Tour B X" class="product-image">
+  <h2 class="product-title">Bridgestone Tour B X</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Tour speed and low spin off the driver with elite-level control around the green.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.8 / 10</p>
+    <p><strong>Worthit Summary:</strong> Built for aggressive swings. Great distance and strong feel off irons, but still offers reliable greenside control for skilled players. Often chosen by high-level amateurs and pros like Bryson.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>High (especially with irons)</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Firm and fast off the face</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~98</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Low driver spin, mid-high iron flight</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Fast swing speeds / Tour-level players</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B09MTQHD8D" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Callaway Chrome Tour X - Top Tier -->
+<div class="product-card" data-category="top-tier">
+  <img src="{{ url_for('static', filename='images/golf/balls/chrometourx.jpg') }}" alt="Callaway Chrome Tour X" class="product-image">
+  <h2 class="product-title">Callaway Chrome Tour X</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Low driver spin, high greenside bite — designed for advanced players who shape shots.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.9 / 10</p>
+    <p><strong>Worthit Summary:</strong> Popular among Callaway fans who want total control tee to green. Plays firmer off the driver than Chrome Soft, but with more shot-shaping control and elite-level spin into greens.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Very high around the green</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Firm Tour feel</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~95</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Low spin driver, high spin irons</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Low handicaps wanting total shot control</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B0C5YFV2XY" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+<!-- Titleist AVX - Top Tier -->
+<div class="product-card" data-category="top-tier">
+  <img src="{{ url_for('static', filename='images/golf/balls/avx.jpg') }}" alt="Titleist AVX" class="product-image">
+  <h2 class="product-title">Titleist AVX</h2>
+  <div class="gear-rating">
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+    <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
+  </div>
+  <p><strong>Highlights:</strong>Lower spin, lower flight alternative to Pro V1 — great for windy conditions and penetrating shots.</p>
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+  <div class="product-details" style="display: none;">
+    <p><strong>WorthIt Rating:</strong> 8.7 / 10</p>
+    <p><strong>Worthit Summary:</strong> Players who want soft feel and low spin without sacrificing control love the AVX. A standout for those who play in wind or prefer a more piercing ball flight compared to the Pro V1.</p>
+    <h4>Performance Highlights:</h4>
+    <table style="width:100%; font-size: 0.95em; border-collapse: collapse;">
+      <tr><td style="width: 140px; vertical-align: top;"><strong>Spin Control:</strong></td><td>Moderate (low off driver, mid irons)</td></tr>
+      <tr><td><strong>Feel:</strong></td><td>Very soft</td></tr>
+      <tr><td><strong>Compression:</strong></td><td>~80</td></tr>
+      <tr><td><strong>Ball Flight:</strong></td><td>Low, penetrating flight</td></tr>
+      <tr><td><strong>Target Golfer:</strong></td><td>Low-to-mid handicaps playing in wind or seeking lower spin</td></tr>
+    </table>
+    <a href="https://www.amazon.com/dp/B08NVYDB5M" target="_blank" class="buy-button">Buy on Amazon</a>
+  </div>
+</div>
+
+</section>
+
 
   <footer>
     Affiliate notice: As an Amazon Associate, we may earn from qualifying purchases — at no extra cost to you.<br />
