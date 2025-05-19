@@ -1,0 +1,43 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# VS Code and PyCharm settings (optional but recommended)
+.vscode/
+.idea/
+
+# Python-specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# MacOS / Windows system files
+.DS_Store
+Thumbs.db
+
+# Secrets / environment settings
+.env
+*.env
+
+# Testing output
+htmlcov/
+coverage.xml
+*.cover
+.cache/
+nosetests.xml
+test-output/
