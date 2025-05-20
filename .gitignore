@@ -41,3 +41,16 @@ coverage.xml
 .cache/
 nosetests.xml
 test-output/
+test_app.py
+# --------------------------
+# Personal files and folders
+# --------------------------
+/personal/
+/notes/
+/drafts/
+*.docx
+*.txt
+*.pdf
+*.png
+*.jpg
+
