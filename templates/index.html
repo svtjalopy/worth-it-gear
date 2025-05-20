@@ -169,6 +169,23 @@
   background-color: #0099ff;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
+.faq-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 40px;
+  padding-left: 20px; /* match your card padding */
+}
+
+.faq-container {
+  max-width: 300px;
+  color: #000;
+  text-align: left;
+}
+
+.faq-container h2 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
 
 
   </style>
@@ -220,7 +237,7 @@ function filterProducts(category, button) {
       <button onclick="searchProducts()">Search Worth It</button>
     </div>
   </header>
-<a href="#faq" style="margin-left: 1em; color: #003366; font-weight: bold;">New to golf balls? Start here</a>
+
   <section class="intro">
     <h2>Top Golf Balls of 2025 (Backed by Real-World Feedback)</h2>
     <p>
@@ -235,7 +252,9 @@ function filterProducts(category, button) {
 <button class="filter-btn" onclick="filterProducts('top-tier', this)">Top Tier</button>
 <button class="filter-btn" onclick="filterProducts('best-overall', this)">Best Overall</button>
 <button class="filter-btn" onclick="filterProducts('budget', this)">Budget</button>
-
+<div style="text-align: center; margin-top: 10px;">
+  <a href="#faq">New to golf balls? Start here</a>
+</div>
 
 </div>
 
@@ -987,30 +1006,54 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
   </div>
 </div>
 
-<div id="faq" style="max-width: 960px; margin: 4em auto; padding: 0 1em;">
-  <h2 style="text-align: center;">New to golf balls? Start here</h2>
 
-  <details style="margin-bottom: 1em;">
-    <summary><strong>What makes golf balls different from each other?</strong></summary>
-    <p>Golf balls differ in compression, spin rate, cover material, and layer count — all of which affect distance, feel, and control.</p>
-  </details>
-
-  <details style="margin-bottom: 1em;">
-    <summary><strong>Which golf ball is best for beginners?</strong></summary>
-    <p>Beginner-friendly balls usually have low compression and a soft feel. They’re easier to hit and more forgiving.</p>
-  </details>
-
-  <details style="margin-bottom: 1em;">
-    <summary><strong>What does compression mean?</strong></summary>
-    <p>Compression measures how much the ball deforms when hit. Lower numbers = softer balls better for slow swings.</p>
-  </details>
-
-  <details>
-    <summary><strong>Do premium balls really make a difference?</strong></summary>
-    <p>Yes — for players with consistent swings, premium balls can offer better spin control and feel, especially on approach shots.</p>
-  </details>
-</div>
 </section>
+<!-- Aligned FAQ section under left product card -->
+<div class="faq-wrapper">
+  <div class="faq-container" id="faq">
+    <h2>New to golf balls? Start here</h2>
+
+    <details>
+      <summary>What makes golf balls different from each other?</summary>
+      <p>
+        Golf balls vary in core compression, cover material (urethane vs. ionomer), number of layers, and dimple design.
+        These differences affect how the ball flies, spins, and feels. Some balls are designed for distance and forgiveness,
+        while others offer more control and spin for skilled players. Choosing the right one depends on your swing speed,
+        skill level, and what parts of your game you want to improve.
+      </p>
+    </details>
+
+    <details>
+      <summary>Which golf ball is best for beginners?</summary>
+      <p>
+        Beginners generally benefit from a low-compression, soft-feeling ball that flies straight and doesn't punish mishits.
+        Look for balls labeled “soft,” “distance,” or “low spin.” Options like the Callaway Supersoft, Wilson Duo Soft+, or
+        Noodle Long & Soft are great because they're easy to hit, feel good off the club, and don’t break the bank if you lose a few.
+      </p>
+    </details>
+
+    <details>
+      <summary>What does compression mean?</summary>
+      <p>
+        Compression is how tightly the ball’s core is packed and how much it deforms on impact.
+        Low-compression balls (around 35–60) are softer and easier to compress, making them ideal for slower swing speeds.
+        High-compression balls (85+) are firmer and work better for faster swings, offering more control and less spin off the driver.
+        Playing the right compression can lead to better distance and feel for your swing.
+      </p>
+    </details>
+
+    <details>
+      <summary>Do premium balls really make a difference?</summary>
+      <p>
+        They do — but only if your game is consistent enough to benefit from it. Premium balls (like the Pro V1 or TP5)
+        offer more spin, better feel, and precise control on approach shots and putts. But if you’re still working on
+        keeping the ball in play or maximizing carry distance, a lower-cost ball may actually perform better for you.
+        Think of premium balls as fine-tuning tools — not magic fixes.
+      </p>
+    </details>
+
+  </div>
+</div>
 
 
   <footer>
