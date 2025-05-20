@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Not all golf balls are created equal. Some fly farther. Some stop faster. Some just save you money. Whether you’re chasing distance off the tee or feel around the green, the right ball makes a difference. We tested the top picks to find out which ones are actually worth your money — and which ones fall short.">
-  <title>Top Golf Balls of 2025 for Your Budget | Worth It Gear</title>
+  <title>Top Golf Balls of 2025 (Backed by Real-World Feedback) | Worth It Gear</title>
   <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}">
 
 
@@ -213,20 +213,23 @@ function filterProducts(category, button) {
 <div style="background-color: rgba(255,255,255,0.10); min-height: 100vh;">
   <header>
     <img src="{{ url_for('static', filename='images/logo_worthitgear.png') }}" alt="Worth It Gear Logo" class="logo">
+
+
     <div class="search-container">
       <input type="text" id="productSearch" placeholder="Search products..." />
       <button onclick="searchProducts()">Search Worth It</button>
     </div>
   </header>
+<a href="#faq" style="font-weight: bold;">New to golf balls? Start here</a>
 
   <section class="intro">
-    <h2>Top Golf Balls of 2025 for Your Budget</h2>
+    <h2>Top Golf Balls of 2025 (Backed by Real-World Feedback)</h2>
     <p>
       Not all golf balls are created equal. Some fly farther. Some stop faster. Some just save you money.
       Whether you’re chasing distance off the tee or feel around the green, the right ball makes a difference.
       We tested the top picks to find out which ones are actually worth your money — and which ones fall short.
     </p>
-    <p>This page is updated daily to ensure pricing, availability, and ratings are current, so you're only seeing the best value options at any given time.</p>
+    <p>We update this page every day to ensure all specs, insights, and recommendations reflect the latest product data — helping you make informed, confident buying decisions.</p>
   </section>
 <div class="filter-buttons" style="text-align: center; margin-top: 2em;">
 <button class="filter-btn" onclick="filterProducts('all', this)">All Balls</button>
@@ -975,6 +978,29 @@ function filterProducts(category, button) {
   </div>
 </div>
 
+<div id="faq" style="max-width: 960px; margin: 4em auto; padding: 0 1em;">
+  <h2 style="text-align: center;">New to golf balls? Start here</h2>
+
+  <details style="margin-bottom: 1em;">
+    <summary><strong>What makes golf balls different from each other?</strong></summary>
+    <p>Golf balls differ in compression, spin rate, cover material, and layer count — all of which affect distance, feel, and control.</p>
+  </details>
+
+  <details style="margin-bottom: 1em;">
+    <summary><strong>Which golf ball is best for beginners?</strong></summary>
+    <p>Beginner-friendly balls usually have low compression and a soft feel. They’re easier to hit and more forgiving.</p>
+  </details>
+
+  <details style="margin-bottom: 1em;">
+    <summary><strong>What does compression mean?</strong></summary>
+    <p>Compression measures how much the ball deforms when hit. Lower numbers = softer balls better for slow swings.</p>
+  </details>
+
+  <details>
+    <summary><strong>Do premium balls really make a difference?</strong></summary>
+    <p>Yes — for players with consistent swings, premium balls can offer better spin control and feel, especially on approach shots.</p>
+  </details>
+</div>
 </section>
 
 
