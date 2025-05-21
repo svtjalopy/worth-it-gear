@@ -93,6 +93,9 @@
       border-radius: 8px;
       padding: 1em;
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      position: relative; /* <- NEW */
+      overflow: visible;   /* <- Allow overlay to extend out */
+
     }
 
     .product-image {
@@ -122,37 +125,67 @@
       color: #333;
     }
 
-    .expand-btn {
-      margin-top: 0.6em;
-      padding: 0.5em 1em;
-      background-color: #ff9900;
-      border: none;
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+
 
     .product-details {
-      margin-top: 1em;
-      border-top: 1px solid #eee;
-      padding-top: 1em;
-      font-size: 0.95em;
-    }
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 1em;
+  z-index: 10;
+  display: none;
+  transition: opacity 0.3s ease;
+  opacity: 0.5;
+}
+  .product-details.show {
+  display: block;
+  opacity: 1;
+}
 
-    .buy-button {
-      display: inline-block;
-      margin-top: 0.8em;
-      background-color: #0073bb;
-      color: white;
-      text-decoration: none;
-      padding: 0.6em 1.2em;
-      border-radius: 6px;
-      font-weight: bold;
-    }
+.card-buttons {
+  display: flex;
+  justify-content: center;  /* Centers both buttons */
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
 
-    .buy-button:hover {
-      background-color: #005fa3;
-    }
+.buy-button, .expand-btn {
+  padding: 10px 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 1em;
+  color: white;
+  cursor: pointer;
+  min-width: 160px;         /* Ensures consistent width */
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+
+
+.buy-button {
+  background-color: #0077C8; /* TaylorMade blue */
+}
+
+.expand-btn {
+  background-color: #2e7d32; /* Golf green */
+}
+
+.buy-button:hover {
+  background-color: #005fa3;
+}
+
+.expand-btn:hover {
+  background-color: #1b5e20; /* Slightly darker on hover */
+}
+
 
     footer {
   text-align: center;
@@ -177,6 +210,47 @@
 .filter-btn:hover {
   background-color: #005fa3;
 }
+.buy-menu {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.buy-dropdown-btn {
+  padding: 10px 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  background-color: #0077C8;
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.buy-links {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.buy-links a {
+  text-decoration: none;
+  background-color: #004a99;
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.buy-links a:hover {
+  background-color: #0066cc;
+}
+
+.hidden {
+  display: none;
+}
+
 
 #filter-active {
   background-color: #0099ff;
@@ -204,6 +278,11 @@
   </style>
 
   <script>
+    function toggleBuyLinks(button) {
+  const menu = button.nextElementSibling;
+  menu.classList.toggle("hidden");
+}
+
     function searchProducts() {
       const input = document.getElementById("productSearch").value.toLowerCase();
       const cards = document.querySelectorAll(".product-card");
@@ -213,11 +292,24 @@
       });
     }
 
-    function toggleDetails(button) {
-  const details = button.nextElementSibling;
-  const isHidden = details.style.display === "none";
-  details.style.display = isHidden ? "block" : "none";
-  button.textContent = isHidden ? "Hide Summary" : "Read Full Summary";
+ function toggleDetails(button) {
+  const card = button.closest('.product-card');
+  if (!card) return;  // Prevents errors
+
+  const details = card.querySelector('.product-details');
+  if (!details) return;  // Also prevents errors
+
+  const isVisible = details.classList.contains("show");
+
+  // Hide all details
+  document.querySelectorAll('.product-details').forEach(el => {
+    el.classList.remove("show");
+  });
+
+  // Show this one if it wasn't already visible
+  if (!isVisible) {
+    details.classList.add("show");
+  }
 }
 
 // ✅ Now define filterProducts outside of toggleDetails
@@ -237,9 +329,12 @@ function filterProducts(category, button) {
 
 
   </script>
+
 </head>
 
+
 <body>
+
 <div style="background-color: rgba(255,255,255,0.10); min-height: 100vh;">
   <header>
     <img src="{{ url_for('static', filename='images/logo_worthitgear.png') }}" alt="Worth It Gear Logo" class="logo">
@@ -272,6 +367,7 @@ function filterProducts(category, button) {
 </div>
 
   <section class="products">
+
   <!-- Pro V1 - Top Tier -->
   <div class="product-card" data-category="top-tier">
     <img src="{{ url_for('static', filename='images/golf/balls/prov1.jpg') }}" alt="Titleist Pro V1" class="product-image">
@@ -284,8 +380,18 @@ function filterProducts(category, button) {
       <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
     </div>
     <p><strong>Highlights:</strong>Tour-level spin, control, and consistency trusted by pros.</p>
+    <div class="card-buttons">
     <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-    <div class="product-details" style="display: none;">
+       <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Titleist-Pro-V1-2025/dp/B0DPN7QZ9R?crid=W9JYA4ARSPAC&dib=eyJ2IjoiMSJ9.DSF_lLKVAjYEcGekncuyAbpI6MbK7yH2vfWf_UOhe_RF9JXOco5qHqTpVf776vi_RmXGhD17YKBS_-5ww6_TdHZKyZuMpm1Id0gQ-qLjMNW21XmgqwErQKVYjxI1psB9MbQAzyPY-GNnVLCMgQ4_v5Hc4KeidpxiK0i8Saw6yLGP677SxQ4vUEzmO_wvX02rMkUUQ1apqjaaUzqhCEI35GUUEqYlqsAaOcHPhyqrBLZ4OHb6KzeKRWQQC8q8l1_rsg5KWKk_ZG1qsjV4BQQZrcFY91xLXlfkXLRf1FnLMbM.kJ_OZZBE-2I5WsYdbisjsTT1rnd84UGTO8orsuRiRh4&dib_tag=se&keywords=prov1%2Bgolf%2Bballs&qid=1747761570&sprefix=prov1%2Caps%2C427&sr=8-7&th=1&linkCode=ll1&tag=worthitgear-20&linkId=bc4a2f28c69509c179d3e3a1f839e284&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+      </div>
+    <div class="product-details">
       <p><strong>WorthIt Rating:</strong> 9.5 / 10</p>
       <p><strong>Worthit Summary:</strong> The Titleist Pro V1 has been the gold standard in golf balls for years — and it still earns that title. With buttery feel, consistent flight, and excellent spin control, it’s the go-to for serious players who want complete performance from tee to green… and for weekend warriors who just really like the idea of playing what the pros play, even if their game says otherwise. Whether you're flighting wedges into tight pins or rolling pure on fast greens, the Pro V1 delivers that high-end feedback better players demand.
 
@@ -298,10 +404,9 @@ function filterProducts(category, button) {
   <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>Penetrating, consistent</td></tr>
   <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Low–mid handicaps / Tour-level</td></tr>
 </table>
-
-      <a href="https://www.amazon.com/dp/B08JZ3LZGH" target="_blank" class="buy-button">Buy on Amazon</a>
     </div>
   </div>
+
     <!-- Titleist PRO V1x -->
 <div class="product-card" data-category="top-tier">
   <img src="{{ url_for('static', filename='images/golf/balls/prov1x.jpg') }}" alt="Titleist Pro V1x" class="product-image">
@@ -314,8 +419,18 @@ function filterProducts(category, button) {
     <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
   </div>
   <p><strong>Highlights:</strong>Higher flight, firmer feel, and even more distance than the Pro V1.</p>
+ <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Titleist-Pro-V1x-2025/dp/B0DPN73WKB?crid=1YQ45Y0QC08JI&dib=eyJ2IjoiMSJ9.j7EEgy8fJnTsRYoHyOJyZbcaEKf1YiTm3WYG6bXWk7MQF9JPcO3NTefKjxAV28Eotohnf33CYlGcKS4CmrlA1_PDRLJI6PjCdf5Xi_zbwDAyr9xFc9dXlomnDbyPSyk_ctR2x5q_O97xhVVsp1ElsYEWSLWNVQv94MzAWaaO6foAfKAMRzNSstZr00FgMxxTsOj8OdDOVyZouJPy9T0gVmqfTWXsKtSixfdQPcpI1drhMya5GDgfYfpkbrV9u6a4ajUyhHgxFLkAzKqV6vzKd0wcegMbLPnGn2BuaGBITL8.3VSBOSMGSGo9BoP2OuQISLPa7BdxR0GjyijxGOYuR3U&dib_tag=se&keywords=prov1x%2Bgolf%2Bballs&qid=1747774233&sprefix=prov1x%2Bgolf%2Bballs%2Caps%2C332&sr=8-6&th=1&linkCode=ll1&tag=worthitgear-20&linkId=ec923a32c8e5cf136e4cbe9f448bbd11&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+    <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 9.4 / 10</p>
     <p><strong>Worthit Summary:</strong> If you want a higher ball flight and a bit more spin on full shots, the Pro V1x hits the mark. It’s a favorite among players who like to shape shots or carry the ball further, and many golfers with faster swing speeds say it performs better than the standard Pro V1. It’s noticeably firmer, which some players prefer, especially in windy conditions — though others mention it lacks that ultra-soft feel around the green. Like its sibling, it’s a premium ball at a premium price, but fans swear by the performance..</p>
     <h4>Performance Highlights:</h4>
@@ -327,8 +442,6 @@ function filterProducts(category, button) {
   <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Faster swingers / Need max distance + spin</td></tr>
 </table>
 
-
-    <a href="https://www.amazon.com/dp/B08JZ4HJ8W" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
 
@@ -343,8 +456,18 @@ function filterProducts(category, button) {
       <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
     </div>
     <p><strong>Highlights:</strong>Tour-quality feel and performance at a mid-tier price.</p>
-    <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-    <div class="product-details" style="display: none;">
+    <div class="card-buttons">
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/TaylorMade-Unisexs-Tour-Response-White/dp/B09MDJF8SB?crid=14J7ZQ7QXZHBY&dib=eyJ2IjoiMSJ9.I46XP2Y6R-4Y-CNj9f9ocUY26xr5S2KG5kwxaxxNL_5LZAlNEY58c_tZ_59ZhNyJG-NUWVuDWSr-_nC632XpSzsPdeLMOevVcmUJ5kvDLsPf86450JTK4LLtXGcsM3Xz3hG7x0wzTbJmNBOTm1JLoMzo1x7KBm82iJIxlMKUBcbZelxQHu3uUp-bWK88tjgbrMMm_Npg2EOvzP7gYsE_bNwrkJlAN585V1aMZ9Vc9MgpvZ-rB1X-4fDAZ7bVt1kaTv6194R6yjxLZAPfNyIa_kg46zuznifRytJMIESm698.PVMtrCdybo3WHT8fsSZir9I_QMZBUUcax9plvKtl7jM&dib_tag=se&keywords=tour%2Bresponse%2Bgolf%2Bballs&qid=1747774322&sprefix=tour%2Brespons%2Bgolf%2Bballs%2Caps%2C256&sr=8-4&th=1&linkCode=ll1&tag=worthitgear-20&linkId=7521ed27b77fd91dd453f3b6ab4fa2d5&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+    <div class="product-details">
       <p><strong>WorthIt Rating:</strong> 8.8 / 10</p>
       <p><strong>Worthit Summary:</strong> The TaylorMade Tour Response is designed to offer tour-level performance at a more accessible price point. Players appreciate its soft urethane cover, which provides excellent feel and control around the greens. Many golfers report a noticeable improvement in spin on approach shots and a satisfying softness off the putter face. While it may not match the distance of some premium balls for those with higher swing speeds, it's a favorite among mid-handicappers seeking quality performance without the premium price tag</p>
       <h4>Performance Highlights:</h4>
@@ -355,11 +478,9 @@ function filterProducts(category, button) {
   <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>High launch, easy to hit</td></tr>
   <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Mid-handicaps who want control & feel</td></tr>
 </table>
-
-
-      <a href="https://www.amazon.com/dp/B082VZ86JZ" target="_blank" class="buy-button">Buy on Amazon</a>
     </div>
   </div>
+
     <!-- TaylorMade TP5 -->
 <div class="product-card" data-category="top-tier">
   <img src="{{ url_for('static', filename='images/golf/balls/tp5.jpg') }}" alt="TaylorMade TP5" class="product-image">
@@ -371,8 +492,18 @@ function filterProducts(category, button) {
     <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
   </div>
   <p><strong>Highlights:</strong>5-layer performance with excellent spin and feel on wedges and irons.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/TaylorMade-Dozen-Golf-Balls-White/dp/B07LF3HTPJ?crid=38UFLCZI7NI8Y&dib=eyJ2IjoiMSJ9.y2FI_mmeeME2vrm3Kapt9fnwVuaB9hIwXXOYsPSqWdO93yqx9WnMDc-nX6ItYsSSmUOzdKVTaMVQO7iQwUdfncpJMNon6mGUtM2x7mD0ju_seW2GKruCGBTjX51O9Shtuvqe_zU44glr3b3swzFpPiloG5COuYBmeyktYp6NGwz9W9fLUT_YeiTEh6dtaazD7L7s0EHfhhHesow7WmyoXK-6m5IRC3MXjsgKAie5GTjNgZD3HL0pKz35bUcUyWCtsbzYNg_esRTC_Tfnl1wLYodoUDYFYAxIIBc_PbSdVcA.jFq2odUZFvGfCSjv3zq7ORwA8ytZev6WGM_p7usDysA&dib_tag=se&keywords=tp5%2Bgolf%2Bballs&qid=1747774379&sprefix=tp5%2Bgolf%2Bballs%2Caps%2C247&sr=8-16&th=1&linkCode=ll1&tag=worthitgear-20&linkId=3ff245fecbb5f096d6e1630acbb4916e&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 9.0 / 10</p>
     <p><strong>Worthit Summary:</strong> The TP5 is a tour-level ball that’s earned high marks for combining distance, feel, and control. Golfers say it’s great off the tee with tight dispersion, and it responds beautifully on full wedges and pitch shots. Around the green, it feels soft without being overly spongy. That said, it’s probably best suited for single-digit handicappers or serious players — some higher handicappers say they can’t really take advantage of everything it offers. If you want a premium ball with tour-level nuance, this one’s hard to beat.</p>
     <h4>Performance Highlights:</h4>
@@ -383,8 +514,6 @@ function filterProducts(category, button) {
   <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>Mid-launch, controllable</td></tr>
   <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Advanced players wanting workability</td></tr>
 </table>
-
-    <a href="https://www.amazon.com/dp/B081TVT8CJ" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
 
@@ -399,8 +528,18 @@ function filterProducts(category, button) {
       <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
     </div>
     <p><strong>Highlights:</strong>Ultra-soft feel and good distance at a great price point.</p>
-    <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-    <div class="product-details" style="display: none;">
+    <div class="card-buttons">
+  <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Callaway-Golf-SUPERSFT-BLU-Splatter/dp/B0CNSDZ4ZZ?crid=382LBHQO7UVDY&dib=eyJ2IjoiMSJ9.tEsBJnYq9JBPvxsqVpRrfc3t867HPJAmoNx2HN-yH_0EdH1UFYxqfkhWZXZ3DXzA2Z5eax8W606BPUGrinVVykcnsbSajwwiRfrI_d_t3o3pC0c8mjeBBvFHr-0UG6RfxevUaF8HkCvPgXa7YxHg5M6ibIhFQTDkLs3cDKL4WwDrHOyCIyGxdYloOFZYc6NzDolX83K6se63scKFNM5xxJcEcgIzQRCJl82zJVZ0MfrVCp6Gmx5mJmIlRacmAVjEldVAsxLUFT9TzWbzeICaDZFnVSEl7qhWTaMlQaMXvnk.U2saMO0vJ6PxenivRlMYvKdd-lrct9kC2YhenxNR5Bo&dib_tag=se&keywords=supersoft%2Bgolf%2Bballs&qid=1747774689&sprefix=supersoft%2Bgolf%2Bballs%2Caps%2C464&sr=8-6&th=1&psc=1&linkCode=ll1&tag=worthitgear-20&linkId=7c734a6d36a93bc94e97b907cbdf060c&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+    <div class="product-details">
       <p><strong>WorthIt Rating:</strong> 8.2 / 10</p>
       <p><strong>Worthit Summary:</strong> The Supersoft has built a loyal following among casual and senior golfers for one big reason — it feels ridiculously soft and flies straight. It’s the ball people keep buying because it’s forgiving and doesn’t punish you for a mishit. Don’t expect tour-level spin or razor-sharp control, though. Around the green, it can feel almost too soft and doesn’t offer much bite on chip shots. But if you’re looking for an easy ball to hit that won’t break the bank, this one lives up to its name.</p>
       <h4>Performance Highlights:</h4>
@@ -411,10 +550,9 @@ function filterProducts(category, button) {
   <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>High launch, straight flight</td></tr>
   <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>High handicaps / seniors / slow swings</td></tr>
 </table>
-
-      <a href="https://www.amazon.com/dp/B07NDZ3K9R" target="_blank" class="buy-button">Buy on Amazon</a>
     </div>
   </div>
+
     <!--Callaway ChromeSoft-->
 <div class="product-card" data-category="best-overall">
   <img src="{{ url_for('static', filename='images/golf/balls/chromesoft.jpg') }}" alt="Callaway Chrome Soft" class="product-image">
@@ -426,8 +564,18 @@ function filterProducts(category, button) {
     <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
   </div>
   <p><strong>Highlights:</strong>Tour performance in a softer, more forgiving package.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/CALLAWAY-Chrome-Balls-White-Triple/dp/B0CJK2X7GK?crid=3GA7GCMTFTGRY&dib=eyJ2IjoiMSJ9.-FxLWTV6X9n7lWkQOGhPNy9eGEqPUzGqdX6twfGgq5k8FZOmQ4VvzH6DBKSzeuofK2FsnwtJzLgWhCTqRKbR2PQz9nNv8zXiX72YzKU0QNonaIV4QHjmTZkBSadcBBaiFIW3wM0lAW4XGMxSoX9pqoNjWFaVEenA7cpdtGCjVVRj_nbJdMQyg978zajzofkd2qylGy_uv2JOq60NZ-l_F9M05LWlf9GzqY-ZPl6ypsAjK8h3aT3r3Il_6-E8RW5u7mGfGOUgc73wI0ZLZyFKSj9UJt8G6U8Ns-ZOeWnP6ho.tuhRzk2EzySabPqHf2h2UIXTziyAje81aY1AoGhcYPg&dib_tag=se&keywords=chromesoft%2Bgolf%2Bballs&qid=1747774841&sprefix=chromesoft%2Bgolf%2Bballs%2Caps%2C378&sr=8-7&th=1&linkCode=ll1&tag=worthitgear-20&linkId=7f4ba7d18fe2f2a3bebfe91cdd51a083&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.7 / 10</p>
     <p><strong>Worthit Summary:</strong> The Chrome Soft blends a premium feel with real-world playability. Golfers love how smooth it feels off the face — soft but not mushy — and it gives good distance without feeling like a rock. The ball offers solid spin around the green for most players, though faster swingers sometimes find it compresses too easily and doesn’t quite match the Pro V1 in stopping power. Still, for mid to low handicappers who want a tour-like ball with a slightly softer edge, this is a go-to option.</p>
     <h4>Performance Highlights:</h4>
@@ -438,10 +586,9 @@ function filterProducts(category, button) {
   <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>High launch, straighter shots</td></tr>
   <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Mid–high handicaps wanting a Tour feel</td></tr>
 </table>
-
-    <a href="https://www.amazon.com/dp/B08HSN1T54" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
     <!--Srixon Q-Star Tour-->
 <div class="product-card" data-category="best-overall">
   <img src="{{ url_for('static', filename='images/golf/balls/qstar.jpg') }}" alt="Srixon Q-Star Tour" class="product-image">
@@ -453,8 +600,18 @@ function filterProducts(category, button) {
     <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
   </div>
   <p><strong>Highlights:</strong>Urethane cover and tour-level features, without the price tag.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Srixon-Q-Star-Tour-Golf-Balls/dp/B0CQPL3HBD?crid=K5MLBQNEZ5WA&dib=eyJ2IjoiMSJ9.97sHWXNyOpQZmd3Qba_QHbPeK4kUQz7xamxwsZzqCqo-jwYQMgUJf-rQfmcKIxkZbvd-_YRi9_6im6S4kcuh0EYUrQHxUqs_uoFmBn7U-7Sy8pm46puH9OnvhDlsO4cMAnG7jhE6Z4u6J9K2EJJmptitvLZo3_DwzJeW_PUrRAzKYBxfix7V83jUrmYVWpjCsRevc9mrdSSPnz_XacVi118skLvVPhJiwWbcPwKtjaUeThnAR_CooPShzC1zyNVhBSk6fmhnvdxDGcR1VAKtNDup1uF0zGyMiju61ACY8eM.4fi1Thmro_kNaUDLywF-zXSzzMD8hdSW3MQ3_vFr_X4&dib_tag=se&keywords=qstar%2Bgolf%2Bballs&qid=1747774894&sprefix=qs%2Bgolf%2Bballs%2Caps%2C2662&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1&linkCode=ll1&tag=worthitgear-20&linkId=f4870b62b763e1ce21acd21d484c9814&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.6 / 10</p>
     <p><strong>Worthit Summary:</strong> The Srixon Q-Star Tour is a standout for golfers with moderate swing speeds who desire tour-level performance. Its urethane cover delivers impressive greenside spin and a soft feel that many players find confidence-inspiring. Users often highlight its consistent flight and durability over multiple rounds. While it may not offer the same level of spin as higher-end tour balls for faster swingers, it's a reliable choice for those seeking a balance between performance and value.</p>
     <h4>Performance Highlights:</h4>
@@ -465,10 +622,9 @@ function filterProducts(category, button) {
   <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>Mid-high, very stable</td></tr>
   <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Moderate swing speeds, casual players</td></tr>
 </table>
-
-    <a href="https://www.amazon.com/dp/B08R6ZTG4C" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
     <!--Srixon Soft Feel-->
 <div class="product-card" data-category="budget">
   <img src="{{ url_for('static', filename='images/golf/balls/softfeel.jpg') }}" alt="Srixon Soft Feel" class="product-image">
@@ -480,8 +636,18 @@ function filterProducts(category, button) {
     <img src="{{ url_for('static', filename='images/favicon.png') }}" alt="Rating" class="gear-icon" />
   </div>
   <p><strong>Highlights:</strong>Beginner-friendly feel and flight for high handicappers and seniors.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Srixon-Soft-Feel-Balls-White/dp/B0DSJN58C2?crid=32YLP499B5I47&dib=eyJ2IjoiMSJ9.hg22F3BsKCvINsO2HTqFZ-cQN_4T3-EWdq5ZlJOUMP6U_jxgghmoF__-G-iwGSwHn9-31Ap3s6KVioWcW6Q0csBT31_UlE3Opv9RX62vfPlMh7nwS8YUQjirp5Q_MMFGmV4MtD9NSWHmJWK8b-_sbBqDv2zpbd6UQBLxfjqPV3BkWeZvDHRh3fZuFTN33Gb4UCM6oX7YHLyzARoKHH623HHnDZn61wgHlmnFPBco-mN739ft36h3laPUAA6de_78m_w1CToG435Mf95nwT4oJevSOaFg8JRsH7XPWDgOJU0.EdtTBxpiCLKPllDtAs7gUSuPDvKfzA7INEVGyNVkcPs&dib_tag=se&keywords=srixon%2Bsoft%2Bfeel%2Bgolf%2Bballs&qid=1747774975&sprefix=softfeel%2Bgolf%2Bballs%2Caps%2C273&sr=8-1&th=1&linkCode=ll1&tag=worthitgear-20&linkId=5907aa74833ffac10689f9fea98c5884&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.3 / 10</p>
     <p><strong>Worthit Summary:</strong> Excellent option for players who prioritize feel and forgiveness. Easy launch and surprisingly soft around the greens.</p>
     <h4>Performance Highlights:</h4>
@@ -492,8 +658,6 @@ function filterProducts(category, button) {
   <tr><td style="width: 140px; vertical-align: top;"><strong>Ball Flight:</strong></td><td>Mid-high launch</td></tr>
   <tr><td style="width: 140px; vertical-align: top;"><strong>Target Golfer:</strong></td><td>Beginners and slower swingers</td></tr>
 </table>
-
-    <a href="https://www.amazon.com/dp/B07X8GX9XY" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
 
@@ -507,8 +671,18 @@ function filterProducts(category, button) {
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Soft feel, easy distance, and budget-friendly for weekend play.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/TaylorMade-2018-Noodle-Long-White/dp/B078S2SWT8?crid=2O1H0TH69727X&dib=eyJ2IjoiMSJ9.HG3TwbMDDS5YBT4_OojFo80t7t14WXF6JAbVXDKo-3rhTRZA1ajKJimZUVguTFQAHoC03GdVM17V1GqYIhOn8ZsORIJhXqwU7xGA_2ifTiils094hjVVLqUUAEA2jXkYJx_W4aRAcajP18_Sp7Ocsn3TZUfFxFY_u8X5ELqlOqDtAGo41P9D_QqmTwrOboLRbDlgQ0ePMhRPIje6LlW1V0DInrVAADgM-EWT5naGVd--7sne0ilwfdg7cmT4PBTuOtGGEkIsHVruiTEwook7IgWQdsd9Fqixsi4RVEiU_lw.ZEuodjrQ22LXG1wcQFnD3AHL-zgRYn4fc61YROVBfKw&dib_tag=se&keywords=noodle+golf+balls&qid=1747775106&sprefix=noodl+golf+balls%2Caps%2C673&sr=8-6&linkCode=ll1&tag=worthitgear-20&linkId=34bcf6aa79b8fdba8d1461351536a50e&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 7.9 / 10</p>
     <p><strong>Worthit Summary:</strong> The Noodle Long & Soft is the official ball of guys who can’t name a single stat from their last round but will tell you they “crushed it on 12.” It’s not trying to be a tour ball. It’s trying to make golf more fun — and cheaper. And somehow, it pulls both off. It launches easy, feels soft, and adds sneaky distance off the tee. Short game? Good enough. Putter feel? Shockingly pleasant. Spin? Let’s not ruin the vibe by asking too many questions.
 This is the ball for people who buy in bulk, forget how many are in their bag, and don't panic when one sails into the pond because hey — it’s a Noodle. You lose one, you just grab another and keep rolling. It’s not just a ball. It’s a lifestyle. And if you know, you know.</p>
@@ -520,9 +694,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>High launch, long carry</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Beginners, seniors, high handicaps</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B00AZ0IBKE" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Vice Pro - Best Overall -->
 <div class="product-card" data-category="best-overall">
   <img src="{{ url_for('static', filename='images/golf/balls/vicepro.jpg') }}" alt="Vice Pro" class="product-image">
@@ -534,8 +708,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Tour-level design with direct-to-consumer pricing. Great control for the cost.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/dp/..." target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.9 / 10</p>
     <p><strong>Worthit Summary:</strong> The Vice Pro has built a solid reputation as a high-performance ball without the high price tag. Players say it feels great off the face — not too soft, not too firm — and delivers strong spin control on wedge shots and approaches. Off the tee, it holds a consistent line and gives respectable distance, especially for those with moderate to fast swing speeds. Around the green, it reacts like a tour ball, which surprises a lot of first-time users. Some golfers mention the cover scuffs more easily than big-name competitors, and a few say it can feel inconsistent on longer putts, but overall it’s a serious value for players who want Pro V1-like performance without the premium price.</p>
     <h4>Performance Highlights:</h4>
@@ -546,9 +730,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Mid-launch, workable flight</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Mid to low handicaps looking for value</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B07PW3MLH9" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Kirkland Signature - Budget -->
 <div class="product-card" data-category="budget">
   <img src="{{ url_for('static', filename='images/golf/balls/kirkland.jpg') }}" alt="Kirkland Signature" class="product-image">
@@ -560,8 +744,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Surprisingly good Tour ball performance for bulk-buy pricing.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Kirkland-Signature-Balls-3-Piece-Urethane/dp/B0C54FYHQ2?crid=3VHKFIDVH2217&dib=eyJ2IjoiMSJ9.ST2QWKjteWlgzT3CEzn6N6jP1AOX4OABflWTsW9YCXO8htYT155cIatASBgtIqPmvsEAqEEdsS8j6A5pjZD9yne7dBnBKpBI4VaTS24T3vTD4oY-cURjcQHJezX8MZBoxWhZYU6H5oC9F1sTV0QbkP-ZBGO6ui664lqhqf1zz15G37imVl9qPLwQh0pmik2VhqSOMVo-b4u3hu_qH3r-Uif1nMNAgPN6EX2XNCc6-_u-Jr_c9TIe9lnzanDlLRJj6z8ARG-R-80tOqQZUwjzXhAa07FMRNFZtaI0F_m5smM.ySefVV14v_RCO8ErRGq-MTcy3CUSuQvMCNlPZ_OiQWA&dib_tag=se&keywords=kirkland+golf+balls&qid=1747777572&sprefix=kirkland+golf+balls%2Caps%2C245&sr=8-3&linkCode=ll1&tag=worthitgear-20&linkId=1d69d055b774cb845b3540c42d737adc&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.5 / 10</p>
     <p><strong>Worthit Summary:</strong> The Kirkland Signature golf ball is the kind of surprise you don’t expect to find between the rotisserie chickens and bulk laundry detergent — but somehow, Costco pulled it off. This 3-piece ball has earned a loyal following for delivering real tour-level spin and soft feel at a fraction of the cost. Around the green, it reacts like a much pricier ball, with nice bite on wedges and a comfortable roll off the putter. Off the tee, it launches high and carries well, though some players say it flies a little too high for windy days. The cover isn't the most durable if you’re taking big swings with wedges, but when you’re paying less than two bucks a ball, it’s hard to complain. If you’ve ever walked in for paper towels and walked out with 24 golf balls, you’re not alone — and honestly, you might’ve just made a great decision.</p>
     <h4>Performance Highlights:</h4>
@@ -572,9 +766,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Mid-high, controllable</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Budget-conscious players who want spin</td></tr>
     </table>
-    <a href="https://www.costco.com" target="_blank" class="buy-button">Buy at Costco</a>
   </div>
 </div>
+
 <!-- Maxfli Tour - Best Overall -->
 <div class="product-card" data-category="best-overall">
   <img src="{{ url_for('static', filename='images/golf/balls/maxfli_tour.jpg') }}" alt="Maxfli Tour" class="product-image">
@@ -586,8 +780,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>High-end feel and strong short game performance for less than $40/dozen.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Maxfli-2023-Tour-Golf-Balls/dp/B0BSL7HTVX?crid=PASMSFA50NIM&dib=eyJ2IjoiMSJ9.T9Ke6kNe6W2AZn3coN5vlxHgUd4Ud1F7DAwkfA-4JrgQnU_oBx4fP6yNmtEZZV4LFI92jxj4Q7o63bvYuFRr5nxPtPhIOMwdf80XpGm1KQeAgwNCLvyZQH2UyuuIo3vHn0RkFs3QMkdrm0QU8WqNTR7Wf7fU6LyanI4U7cSUBaKMC3Y0O11tJX_V6ntB-MaKIr5ES8co3lMdNfJ-lsOrkfJOlvstfi5WW-YficWRZ-wvQm889eMWosu8ueA4fubazqXWPSzjtKBan-vH0PQA5VAg0QkDjOC7vmQhN3M1oYU.7Wo58HyV_sKrkG6-B2B7EC_h_5kOUJBqIR8299diD1s&dib_tag=se&keywords=maxfli+tour+golf+balls&qid=1747781234&sprefix=maxfli+tour+golf+balls%2Caps%2C150&sr=8-44&linkCode=ll1&tag=worthitgear-20&linkId=c26b097129ef8a9f4e9220a2641d2481&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.7 / 10</p>
     <p><strong>Worthit Summary:</strong> The Maxfli Tour has quietly built a reputation as one of the best under-the-radar balls out there. It’s a true 3-piece urethane ball with performance that rivals models nearly twice the price — and golfers who’ve tried it often end up wondering why they ever paid more. Off the tee, it flies long and straight, and the spin control on approach shots is surprisingly dialed-in. Around the green, it’s got a clean, soft feel without being mushy. Some players say it doesn’t quite match the buttery smoothness of a Pro V1 or TP5, but it’s not trying to. It’s trying to save you money — and based on the reviews, it’s doing a pretty great job.</p>
     <h4>Performance Highlights:</h4>
@@ -598,9 +802,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Penetrating with good control</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Mid to low handicaps looking for Tour feel without Tour price</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B08MNSDWGR" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Bridgestone e6 - Budget -->
 <div class="product-card" data-category="budget">
   <img src="{{ url_for('static', filename='images/golf/balls/e6.jpg') }}" alt="Bridgestone e6" class="product-image">
@@ -612,8 +816,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Straight flight, soft feel, and great value for mid-to-high handicaps.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Bridgestone-2023-White-Golf-Ball-Dozen/dp/B0BN4PJRXR?crid=3O0ICKP75Z9HC&dib=eyJ2IjoiMSJ9.hRa4h8uzX6TMvjGl2-6MtU_tL0efrzIMFKCkwc4WSvW8vzCCc0hYdCw17TFjUtnzgmcE4W7pgg2Tv-i6zajIoKh2bJ346ObTFH2jb3wkx52XNkhCtYArHI8D6BBcH3UQxTip77x7IGP6fuZ1su0n4DM3oJLnKIrOQBPeZ7VuGJCSY8LdIsdUfLS8hcZqOD_VqKvibLZ4-uNmL2-LwJC4i3DVjr3lDrk9DUOudQV0mX8rStR-LPMx6l3yrA2gQVTfOcOQZ2Il_8od0G2ho2UnkvL1j8QeJqdZiYDEdFBOLtE.1zgPwuHW74LIoX5VVBGHySIqX5YP2r3jJ8VPdlTrFmc&dib_tag=se&keywords=e6%2Bgolf%2Bballs&qid=1747781389&sprefix=e6%2Bgolf%2Bballs%2Caps%2C165&sr=8-4&th=1&linkCode=ll1&tag=worthitgear-20&linkId=7668d3069851d03fbb6d33bcdb2059e6&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.4 / 10</p>
     <p><strong>Worthit Summary:</strong> The e6 is all about forgiveness and consistency, and it really shines for golfers who struggle with slices or inconsistent ball flight. Players report noticeably straighter drives, and many high handicappers say it’s helped them keep more balls in play. Around the green, it’s not going to stop on a dime, and the feel can be a little dull for players used to tour-level balls. Still, for a ball that reduces side spin and builds confidence off the tee, it’s a budget-friendly winner.</p>
     <h4>Performance Highlights:</h4>
@@ -624,9 +838,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Straight, mid-high launch</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Mid-to-high handicaps / Slice-prone players</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B09S3X3SVC" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Titleist Tour Soft - Best Overall -->
 <div class="product-card" data-category="best-overall">
   <img src="{{ url_for('static', filename='images/golf/balls/toursoft.jpg') }}" alt="Titleist Tour Soft" class="product-image">
@@ -638,8 +852,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Well-rounded ball that feels soft but still performs across the bag. Great pick for players who want consistency without going full Tour.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Titleist-Tour-Balls-White-Dozen/dp/B0CPKP6L8R?crid=13Y05QBWRHUBQ&dib=eyJ2IjoiMSJ9.ZFUWmCJqp7HozmIOksh7WageJyFzEAS6pJ_JB4HMIzQKX5p_bqXx6BRGXMr-7BXinqQVjL0g4BSlVG8nW1U4jde7R1_3DqJMo4z4Mc1fHsklXX-iI83HssOCtQ-CGrA9y1TGloY2G6rzRfnDXl5-OXLB25-A29-lKpdGnu3P49gmd8P61SyYYvRQpF5la8znIWpJJSOp8gyS5MFaO6dVNtKY0a7jckxy-cDPB3opIY8EJt_PcRZl3l3lODf1XAugSEvfTFxhN2OMUlReEK6F7DlkuhZtN4mhkPzrQwPRF94.ZzByF9vA-ev2PEpMrvhty_5PojsXrruUPMX0cQRliqk&dib_tag=se&keywords=tour%2Bsoft%2Bgolf%2Bballs&qid=1747782309&sprefix=tour%2Bsoft%2Bgolf%2Bballs%2Caps%2C139&sr=8-1&th=1&linkCode=ll1&tag=worthitgear-20&linkId=1e6213b7e9e9314d246d3bed0f3d84a1&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.6 / 10</p>
     <p><strong>Worthit Summary:</strong> The Tour Soft is a middle-ground ball that’s quietly built a strong reputation among mid-handicap players. It’s got a smoother feel than many other balls in its price range and offers decent control on approach shots. You won’t get the spin of a Pro V1, but for the average golfer who wants something that feels good and flies straight, this ball delivers. It doesn’t really blow anyone away in any one category — and some wish it had more bite around the greens — but it’s consistently solid and earns repeat buyers.</p>
     <h4>Performance Highlights:</h4>
@@ -650,9 +874,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Mid-high, smooth trajectory</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Mid-handicaps who want feel and control</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B08NVY1XXS" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Wilson Triad - Best Overall -->
 <div class="product-card" data-category="best-overall">
   <img src="{{ url_for('static', filename='images/golf/balls/triad.jpg') }}" alt="Wilson Triad" class="product-image">
@@ -664,8 +888,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Engineered for consistency. Strong spin, soft feel, and low driver dispersion.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/s?k=wilson+triad+golf+balls&crid=2YMCX0PMSPY9K&sprefix=wilson+triad+golf+balls%2Caps%2C151&linkCode=ll2&tag=worthitgear-20&linkId=30cf2a730348b949968c177869a568b1&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.7 / 10</p>
     <p><strong>Worthit Summary:</strong> The Wilson Triad is a newer contender that’s been getting solid reviews for bridging the gap between performance and price. It’s designed for players seeking more control without paying tour-level prices. Many golfers say it flies straight, holds its line in wind, and gives a firm but satisfying feel. Around the green, the spin is decent — not elite, but reliable. Some note that it plays better for players with smoother swings rather than all-out speed. It’s a smart choice if you’re a mid-handicapper looking to level up without going broke.</p>
     <h4>Performance Highlights:</h4>
@@ -676,9 +910,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Mid-launch, tight dispersion</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Mid-to-low handicaps looking for control</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B09MRYCJTZ" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Callaway ERC Soft - Best Overall -->
 <div class="product-card" data-category="best-overall">
   <img src="{{ url_for('static', filename='images/golf/balls/ercsoft.jpg') }}" alt="Callaway ERC Soft" class="product-image">
@@ -690,8 +924,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Soft, long, and packed with triple track alignment help.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Callaway-Triple-Track-Balls-White/dp/B08T4Q5N8V?crid=2YCY8EZBL3P58&dib=eyJ2IjoiMSJ9.iY27G5YIPrZ9unT0xSQtiti-O5QCDU6JhBkxtYY47COZOq2omKma9FrqghxSzXgRHRx0RZREOtXqT1pa2y0h4Kt5IQVsJZcJmF63xaDjf7sdqFSuVENx4eaQj6VmVhPAqwJiVJ2qOLO5Knd2WbU-YU93yNWZsD9m9KWRX_6ewV_qYpPzVuZ7y5xOphMENGBdlG7LuA3VTDKgKi_F3SSJH4VZ9OydN46Fc7_4My9B3j_5poi8VOFK2XwH0Hn-r88eKxtKznEGQQrCXr9-JHOHNQ4WQKb1QkR9izln-J79c9c.5i5LyyIH-IYaWinMjBR4o0t4wJYNcc9c1_vPFU8rkoM&dib_tag=se&keywords=erc%2Bgolf%2Bballs&qid=1747783103&sprefix=erc%2Bgolf%2Bballs%2Caps%2C166&sr=8-4&th=1&psc=1&linkCode=ll1&tag=worthitgear-20&linkId=644a36fca90cfb7af939a8b25afbc839&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.6 / 10</p>
     <p><strong>Worthit Summary:</strong> The ERC Soft walks the line between premium performance and casual-player friendliness. It’s one of Callaway’s longest balls in the soft category, and golfers say it lives up to that claim — especially off the driver. The Triple Track alignment is a love-it-or-leave-it feature, but many players say it actually helps them aim better on the greens. Around the green, the feel is soft and smooth, though not as spinny as a Chrome Soft or other urethane balls. Some players note the hybrid cover doesn’t quite bite like tour models, but for most, the trade-off in extra distance and easier alignment makes it a keeper.</p>
     <h4>Performance Highlights:</h4>
@@ -702,9 +946,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>High launch, straight</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Mid-handicaps, alignment-focused players</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B08P2DXXKP" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- TaylorMade TP5x - Top Tier -->
 <div class="product-card" data-category="top-tier">
   <img src="{{ url_for('static', filename='images/golf/balls/tp5x.jpg') }}" alt="TaylorMade TP5x" class="product-image">
@@ -716,8 +960,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Tour-level distance and control for high-speed players.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/TaylorMade-2021-TP5x-Balls-White/dp/B08QSNCWF3?crid=1PBFVPPAMN18Z&dib=eyJ2IjoiMSJ9.MOUp0yH8twFmisRNzEh4IiO4-fj-XS6e5trVpFDHJ5_A8JTR4iwVk3neAA9mlFGowIjUE4mL0xqz_Hy5Hm4sVIXKKMp6OnKoqdovEym7YFVG1fFp2jxSDjboJSU-g2Tsr3_Cjukxb54YSdUDpa7GvdIVXap4RRFQm6_U4poZHURWAmPUwK6foUnFOpQY1ZaQXXJe5XXclmvUBvoUkofiF8GorzKraTHdKYICiJ23fEIvh16Cl6yN5d4-y-jzG8bRN0-AlWUrslAllx-v9e_kYLG_so8uQz5vAtHSiNoeDGw.aKlZR70PLaZgUBPt2wN1QWD6ismDFfMb3llOkqw8rfg&dib_tag=se&keywords=tp5x%2Bgolf%2Bballs&qid=1747783215&sprefix=tp5x%2Bgolf%2Bballs%2Caps%2C134&sr=8-5&th=1&linkCode=ll1&tag=worthitgear-20&linkId=28a2929ac266538f61f4523a8cf5fd3c&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 9.1 / 10</p>
     <p><strong>Worthit Summary:</strong> For players who like the TP5 but want a firmer feel and more pop off the tee, the TP5x delivers. It’s built for speed and low spin off the driver, which makes it a favorite among players with faster swings. Around the green, it still checks up reasonably well, though it doesn’t have the same soft touch as the TP5 on delicate chips. A few players say it feels too firm, especially on putts, but others appreciate the feedback and control. Overall, it’s a strong choice if you want distance without sacrificing too much feel.
 
@@ -730,9 +984,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>High launch, low spin off driver</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Low handicaps / High-speed players</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B081TVX16S" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Srixon Z-Star - Top Tier -->
 <div class="product-card" data-category="top-tier">
   <img src="{{ url_for('static', filename='images/golf/balls/zstar.jpg') }}" alt="Srixon Z-Star" class="product-image">
@@ -744,8 +998,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Tour control and bite with a softer feel than most premium balls.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Srixon-Z-Star-Z-Star/dp/B0BV6P2MNG?crid=1WN1PP8115K07&dib=eyJ2IjoiMSJ9.iP9lxi7dQaI4dA6LFJ882VrECLIi2Eyd481xxxtURgXv9soCS33n1UBE2Dc9ulFm-DcmI-Vr9WXqvOQqyHZkceXfwyUWjKYKHbpCStL5OilillRAcfEK3XYlI5f3Kcor0Z0xguApEKhIGmK5OsSj5iIoxgl1lAk1RUBQ4hbw4zygz9s5f4lfQUG2zoFP5reCePdLMUxdLcuK0L15oiiQIDQbGo38Q8xZFX60KVLKa5j8NX8GKALoM4gcEn2xhpSQ2pSB_CM6i4k_FFFiMbUiAKpoQ-2J9bU8VyQuXXd4vvU.GKKXW-GtKB2wZ2kpqN7Z6XKiGupefBZqm_YRBEWjhso&dib_tag=se&keywords=z%2Bstar%2Bgolf%2Bballs&qid=1747783337&sprefix=z%2Bstar%2Bgolf%2Bballs%2Caps%2C146&sr=8-1&th=1&linkCode=ll1&tag=worthitgear-20&linkId=4a16aec701ca0bc5894b02fa941d221f&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.9 / 10</p>
     <p><strong>Worthit Summary:</strong> The Z-Star has become a legit tour-caliber contender that doesn’t always get the spotlight it deserves. Players love how it blends a soft feel with high spin around the greens and solid distance off the tee. It’s especially popular with skilled players who want to flight the ball and shape shots. Some golfers say the cover scuffs a little too easily and that it doesn’t quite match the Pro V1 in consistency, but for the price and performance, it punches way above its weight..</p>
     <h4>Performance Highlights:</h4>
@@ -756,9 +1020,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Mid-high launch, workable</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Low-to-mid handicaps who want max greenside control</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B08SJ26W4W" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Bridgestone Tour B X - Top Tier -->
 <div class="product-card" data-category="top-tier">
   <img src="{{ url_for('static', filename='images/golf/balls/tourbx.jpg') }}" alt="Bridgestone Tour B X" class="product-image">
@@ -770,8 +1034,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Tour speed and low spin off the driver with elite-level control around the green.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Bridgestone-Golf-Balls-Dozen-White/dp/B082X4DVDG?crid=S0VU4R408DNS&dib=eyJ2IjoiMSJ9.Vo1iw_cjQWA_F8r1SAGsO9621GyxSRQKnM321r3jcOPuVy7Te0EWUTMmmaq6ylFPoP83gH4X8FZsW89PiSC4_9PU0FntGt-sGXj1fY7nHycuW9DYesKXNx-i1sdH0OT1_i0Zbr9_RLdnuI-Mt0rrXtu55n-Pq3FiHVI0zElnD6s4iOO-x3l54H4S5bPhu--YaJyx7zUhozS-iAdEdUbZflZHVaGLWa5pZjPVZvTezZfK3GKtoHbugvJPK_f3bW7xHmOGqx66is4fNIuTMyM-5PN6VicrgcF4tq32tf1YkDc.ZLGVG5uovaP8Ipds5MsXdtTHswflVT5M8JbyUrmO-ts&dib_tag=se&keywords=tour+b+x+golf+balls&qid=1747783447&sprefix=tour+bx+golf+balls%2Caps%2C142&sr=8-7&linkCode=ll1&tag=worthitgear-20&linkId=09311a2860dada03614612665e19443e&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.8 / 10</p>
     <p><strong>Worthit Summary:</strong> The Tour B X is designed for high-speed players who want to maximize distance without losing greenside bite. Golfers say it feels firm off the tee but still gives that satisfying hop-and-stop control on approach shots. It’s a favorite of Bryson DeChambeau and other power hitters, and you can feel that “Tour” DNA in the way it flies and reacts. That said, it’s not the softest ball on touch shots, and slower swingers might struggle to compress it. But if you’ve got speed and like a bold, firm feel — it’s a beast.</p>
     <h4>Performance Highlights:</h4>
@@ -782,9 +1056,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Low driver spin, mid-high iron flight</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Fast swing speeds / Tour-level players</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B09MTQHD8D" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Callaway Chrome Tour X - Top Tier -->
 <div class="product-card" data-category="top-tier">
   <img src="{{ url_for('static', filename='images/golf/balls/chrometourx.jpg') }}" alt="Callaway Chrome Tour X" class="product-image">
@@ -796,8 +1070,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Low driver spin, high greenside bite — designed for advanced players who shape shots.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/CALLAWAY-Chrome-Balls-White-Standard/dp/B0CJK178MP?crid=23BGXOS4MU4NV&dib=eyJ2IjoiMSJ9.fTRsIt6HiFUcMoTdwy83W7Ja0CK-bkUYPn1djSz0doF_Utv9SmvNyRzBle4xVb_vapwa7HVbLOoeToJkJhy72O2PvtD2lpHxBkRkapU_7OTvLTbTtrXlbbUofTGnUo1PTIDf9LYgKYkG2JW2ZqqbKZT1CIbAbm3Bq-Gmt8qH2yYyJqiWhXqgNih0PpWkq6lOE_WMn-nuQ5oau3kUPq0ud1EVZxSt5dqZH2uz0_ZLX0xpMU9axeAPOznJK1XexzxYjuLQCeKuVs14Sgrd17I4FtPgReIrKYiHVuZNWoFpn5w.lF3Cvk5R39lpKkd5ScWHVovh0T_XR0N1MV2JBTQxBq4&dib_tag=se&keywords=chrome%2Btour%2Bx%2Bgolf%2Bballs&qid=1747784011&sprefix=chrome%2Bx%2Bgolf%2Bballs%2Caps%2C136&sr=8-4&th=1&linkCode=ll1&tag=worthitgear-20&linkId=7bf4a9c68a5bda6ff8634cbd27e0931a&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.9 / 10</p>
     <p><strong>Worthit Summary:</strong> Built for players who want even more speed and spin, the Chrome Tour X is Callaway’s answer to the Pro V1x and TP5x. It’s firm, fast, and gives strong feedback off the club — especially on full swings. Players say it spins aggressively on approach shots, which is great for those who want to zip the ball back or stick it close. That same spin can be tough to manage for high handicappers, and the firm feel isn’t for everyone. But for players who want total control and high performance, it’s a rising star.</p>
     <h4>Performance Highlights:</h4>
@@ -808,9 +1092,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Low spin driver, high spin irons</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Low handicaps wanting total shot control</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B0C5YFV2XY" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Titleist AVX - Top Tier -->
 <div class="product-card" data-category="top-tier">
   <img src="{{ url_for('static', filename='images/golf/balls/avx.jpg') }}" alt="Titleist AVX" class="product-image">
@@ -822,8 +1106,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Lower spin, lower flight alternative to Pro V1 — great for windy conditions and penetrating shots.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Titleist-AVX-White-One-Dozen/dp/B0CPKV66MY?crid=5TJNZ79UXEVV&dib=eyJ2IjoiMSJ9.SI-pIQLLsNE6MTTZ_rU84-TigCO8TpyYhNCBYMfum4s3qF5KhfodIHVs0QZ2_18IQRUuHdecFFgPvMvJ7z4cnTRpuH_6I29IlBOqVFx6jRR5kP3fjxHHMaKJkIiFJFELJAh2tLSe9tLHwyJkPPvxOxQQwKLU-_cKUOKt-FLMbpKkjNz9pK-0MZKmIDrL12YfZpNf6hhnSzzc9G5MnrRKzSxOMBHma-vyIkBvjgeekba7hZ0IQ7bSmrXnFa3XCk4AvxHeF9yj5YPibzu89jYbf8FpcX997rcistTHyGS5kyE.8tWzfIVFE0jco_Vw7papV3FJL4WfC1DnknA9v-CYtqk&dib_tag=se&keywords=avx%2Bgolf%2Bballs&qid=1747784088&sprefix=avx%2Bgolf%2Bballs%2Caps%2C131&sr=8-6&th=1&linkCode=ll1&tag=worthitgear-20&linkId=e917638b56925a81556f545e98bf76b8&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.7 / 10</p>
     <p><strong>Worthit Summary:</strong> The AVX is a bit of a sleeper hit in the Titleist lineup. Players who’ve tried it often stick with it because of the lower, piercing flight and super soft feel. It doesn’t spin as much as a Pro V1, which is perfect for golfers who want less ballooning and more roll out. Around the greens, it has a very smooth, muted response — some players love that, while others wish for a little more grab. It’s especially popular in windy regions and with players who want premium feel without high launch.</p>
     <h4>Performance Highlights:</h4>
@@ -834,9 +1128,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>Low, penetrating flight</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Low-to-mid handicaps playing in wind or seeking lower spin</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B08NVYDB5M" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Pinnacle Rush - Budget -->
 <div class="product-card" data-category="budget">
   <img src="{{ url_for('static', filename='images/golf/balls/pinnacle_rush.jpg') }}" alt="Pinnacle Rush" class="product-image">
@@ -847,8 +1141,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Maximum distance focus with little feel or spin control.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Pinnacle-P4034S-15PNA-2-Rush-White-15-Ball/dp/B0BVG8DQVR?crid=KJT7Q5LLYHR6&dib=eyJ2IjoiMSJ9.YxBLivzG80V-k6xU_QItCTSLMas16JTJbXScvnhFs_Wf6FZwr7ykaQTwHVwVCclz3ZrWjdHodK5PA0FofESNK3TtcLcGmshX3wYAe2jD3Nzb3M0xbRk8uVOvNA_U8BPRgsqThbKFx-rx6eDRLeV5rkdOxPeNJ4KgfBBIL2Z4t92-mrAh44EXU7Iv7PEPdfa2oN7ercVD4GvFmjMfjpxrWcor8jpTL4-usbciAcIh2WVbejGur8Y3fStNw-_BhDpa-_ly6aC4U19onJuAf3sMv6LDqH9EM6sTJK4hWv0jAjY.RPfNvdbcRfEJMTAxN13vIWE6JEfPdjTyUapdcx7FmQo&dib_tag=se&keywords=pinnacle+rush+golf+balls&qid=1747784249&sprefix=pinnacle+rush+golf+balls%2Caps%2C139&sr=8-1&linkCode=ll1&tag=worthitgear-20&linkId=56628128fb93349a01c70ba382098bd0&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 7.3 / 10</p>
     <p><strong>Worthit Summary:</strong> The Pinnacle Rush is for golfers who have one thing in mind: smashing it as far down the fairway as humanly possible. This ball doesn’t pretend to be soft, spinny, or tour-caliber — it’s here for big distance, and that’s exactly what it delivers. Players say it feels firm off the clubface, especially on wedges and putts, but if you’re looking for yardage gains without emptying your wallet, the Rush has your back. It’s a favorite among high handicappers, casual weekend warriors.
       Honestly, it’s the kind of ball you load up on in a 15-pack at the sporting goods store because it says “Distance” on the box in size 72 font.</p>
@@ -860,9 +1164,9 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
       <tr><td><strong>Ball Flight:</strong></td><td>High and long</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Distance-seeking beginners</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B08LNTSL4W" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Nitro Ultimate Distance - Budget -->
 <div class="product-card" data-category="budget">
   <img src="{{ url_for('static', filename='images/golf/balls/nitro.jpg') }}" alt="Nitro Ultimate Distance" class="product-image">
@@ -872,8 +1176,18 @@ This is the ball for people who buy in bulk, forget how many are in their bag, a
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Extremely cheap. Good for practice or casual hacks — not performance.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+      <a href="https://www.amazon.com/Nitro-Ultimate-Distance-15-Pack-White/dp/B00JJQQK64?crid=6CPPIYRTEM89&dib=eyJ2IjoiMSJ9.iG19cCdQyn0JHRTBk3GqVo9CYkz_zou6jF3zZpvNtxZpCGzL4nJZHOXBBJSUkq5iciVe0tarpqeXQdbJfrgrEJSEy-DXJkxXzCpA7Nf9rhh_wm1WJ683_OlwBKXbAgwYbJwcY113UUPw-zkgFuyeJEg6B_3bH6ti690rPQlQenQkU1vLPg1_zCIYTUrbjWrV0bvx9P6he-umTg2-0iG2JKaXbrAycATYMGMioa2G0VCc_-HQY0Ym-YH_3RQDADdjbonN8NQPmhq--MnM_1jBCV-PqnqesXNHqbxh4CepMJ8.sKHvM7ZnV4LjSippxGmn-sQ9jWvkhbHnYHBbG61nazw&dib_tag=se&keywords=nitro+ultimate+distance+golf+balls&qid=1747784483&sprefix=nitro+ultimate+distance+golf+balls%2Caps%2C141&sr=8-2&linkCode=ll1&tag=worthitgear-20&linkId=4573570368cec7204749b08e453398e4&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 6.5 / 10</p>
     <p><strong>Worthit Summary:</strong> The Nitro Ultimate Distance doesn’t claim to be soft. It doesn’t claim to be spinny. What it does claim is right there in the name — distance. And it delivers… with all the subtlety of a cannonball. Players say it jumps off the driver face like it’s late for something, and it’s built to survive full-contact golf — cart paths, tree trunks, even that one bunker rake you definitely didn’t see coming. Feel? Not really. Greenside control? Let’s not get carried away. But if your priorities are “cheap, fast, and borderline indestructible,” this one hits all three.
 
@@ -886,9 +1200,9 @@ It’s the ball you buy by the bucket, not the dozen — and if one goes missing
       <tr><td><strong>Ball Flight:</strong></td><td>Fast, straight</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Casual / Practice use</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B000FZ3C1A" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Wilson Ultra - Budget -->
 <div class="product-card" data-category="budget">
   <img src="{{ url_for('static', filename='images/golf/balls/wilson_ultra.jpg') }}" alt="Wilson Ultra 500" class="product-image">
@@ -899,8 +1213,18 @@ It’s the ball you buy by the bucket, not the dozen — and if one goes missing
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Popular big-box ball with long flight and basic feel.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/WILSON-Ultra-Distance-Golf-Balls/dp/B0BT22GCK7?content-id=amzn1.sym.87b1f643-33a9-49d2-948f-44f2ccfe0508%3Aamzn1.sym.87b1f643-33a9-49d2-948f-44f2ccfe0508&crid=JHUJ48142IUU&cv_ct_cx=wilson%2Bultra%2Bgolf%2Bballs&keywords=wilson%2Bultra%2Bgolf%2Bballs&pd_rd_i=B0BT22GCK7&pd_rd_r=3cc8876b-3fe9-4650-aeb9-9f25a7a08a47&pd_rd_w=Hx1X1&pd_rd_wg=EX2qI&pf_rd_p=87b1f643-33a9-49d2-948f-44f2ccfe0508&pf_rd_r=KBHMG33ZFSB6V8Z6FGED&qid=1747784731&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&sprefix=wilson%2Bultra%2Bgolf%2Bballs%2Caps%2C137&sr=1-1-6024b2a3-78e4-4fed-8fed-e1613be3bcce-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9zZWFyY2hfdGhlbWF0aWM&th=1&linkCode=ll1&tag=worthitgear-20&linkId=69970f624f1f4cb038bd4485cd771fa3&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 7.2 / 10</p>
     <p><strong>Worthit Summary:</strong> The Wilson Ultra has one goal in life: go far, stay cheap, and don’t overthink it. This is a no-frills distance ball that’s been around forever, and for good reason — it just works for casual players who want to grip it and rip it. Off the driver, it’s got some serious pop, and it holds up well to the occasional thin shot or cart path bounce. Around the green? Let’s just say it prefers to keep rolling. Feel-wise, it’s about as firm as they come, but at this price, it’s tough to complain.
 
@@ -913,7 +1237,6 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
       <tr><td><strong>Ball Flight:</strong></td><td>Straight, long</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Beginners / casuals on a budget</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B07NFQVJ69" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
 
@@ -927,8 +1250,18 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Super soft feel with limited control — built for comfort, not precision.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+     <a href="https://www.amazon.com/Maxfli-Softfli-Glossy-White-Balls/dp/B07BRWRQPT?crid=1QS4N4CS3GIM2&dib=eyJ2IjoiMSJ9.A5wcytRwQa_9OtSCSz_S5sPsVb8LLXWUxqZDSlva5SMMi5WlY0Vjw_xh2JQsPmeks4MAnvOzOyZ50i0AHfkiB1dvMUHqHVGApjm0MEYOE2dmFlQF-FU7jmtE0QeCOQfwXVmPqr8xulch8k0lcMyYSKP_WHlazMCJYA02A3B0YtWzDDIO-D2sqt0UeS5RI_p5kG1AdrD105oVpET0TuUIqDiS4xbuWSUlfTRTu7UeY1w-m9zI3rgCPazxcP5BHRX6C-yWY3A7KrMirBnOLyWiFrFfMwckCSchotIl5djE7a8.uYZFT51JVG_MkzPbrE2-QwZoTIQmWr5515SfsTnysA0&dib_tag=se&keywords=softfli+golf+balls&qid=1747784917&s=sporting-goods&sprefix=softfli+golf+balls%2Csporting%2C119&sr=1-6&linkCode=ll1&tag=worthitgear-20&linkId=5899a67a390272a62d77af0ae02ea119&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 7.4 / 10</p>
     <p><strong>Worthit Summary:</strong> The Softfli is one of the softest feeling balls on the market, and it’s a favorite among players with slower swing speeds or those just looking for an easy, forgiving ball. It’s incredibly easy to compress and has a nice touch on chips and putts. Don’t expect huge distance or much spin control — it’s not built for that — but for the price, it’s a fun ball to play, especially if you prioritize feel over performance numbers.</p>
     <h4>Performance Highlights:</h4>
@@ -939,9 +1272,9 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
       <tr><td><strong>Ball Flight:</strong></td><td>High launch, forgiving</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Slow swings / comfort seekers</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B07H9QMP72" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Maxfli Straightfli - Budget -->
 <div class="product-card" data-category="budget">
   <img src="{{ url_for('static', filename='images/golf/balls/straightfli.jpg') }}" alt="Maxfli Straightfli" class="product-image">
@@ -952,8 +1285,18 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Low spin and high forgiveness — designed to reduce slices and hooks.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Maxfli-Straightfli-Golf-Balls-Pack/dp/B07BRVGKQ6?crid=LB8Q845Z3B3J&dib=eyJ2IjoiMSJ9.COSeEJBxwO0RjwnXD0da4JuMHEbAS40Hf5UjrljVev-Seg98h2mmsgDix63uMRnai_lBiML7ab3BYhSkxUtkAFW5Pp0V8mE8nEDUzUp1YkQx57D89V2vDC-wdue79sbGEGvkHu2wA_TWsUK1TUuFHwzYhfY0B3kcw_McldxF9tFVAifnKM642ObsT1CyL3ngCUiCCk_Q4pCrZD1LgzvQAoK5LjzsrmTKGHuXVEHx3rgBtitzq_iF5jOgyUQK9H0NxvwyMMZBEqrSleVCCSPUkgvBWl_ZY2yNk7tJT40keUQ.7U8TJfqdo97L-KOa4GdgnSEsWHHK3eQLwfMhDIyeFFg&dib_tag=se&keywords=straightfli+golf+balls&qid=1747785425&s=sporting-goods&sprefix=straightfli+golf+balls%2Csporting%2C93&sr=1-2&linkCode=ll1&tag=worthitgear-20&linkId=9d62462743f65150e8ab2c6aa5746df5&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 7.6 / 10</p>
     <p><strong>Worthit Summary:</strong> True to its name, the Straightfli is built for one thing — going straight. Golfers who tend to slice or hook say this ball noticeably reduces curve, especially off the tee. It doesn’t offer much spin or touch near the green, and it’s not a ball for shaping shots, but for someone looking to hit more fairways and keep things simple, it’s a great value. The feel isn’t anything special, but the confidence it gives on long holes keeps players coming back.</p>
     <h4>Performance Highlights:</h4>
@@ -964,9 +1307,9 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
       <tr><td><strong>Ball Flight:</strong></td><td>Straight, high launch</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>High handicaps / slice-prone players</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B07MH8R1WL" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Maxfli Trifli - Best Overall -->
 <div class="product-card" data-category="best-overall">
   <img src="{{ url_for('static', filename='images/golf/balls/trifli.jpg') }}" alt="Maxfli Trifli" class="product-image">
@@ -978,8 +1321,18 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Triple-layer performance with added control and feel — budget-friendly Tour alternative.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/dp/..." target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 8.2 / 10</p>
     <p><strong>Worthit Summary:</strong> The Trifli offers a surprising amount of balance for a mid-tier ball. Players say it gives solid distance, holds up well through a round, and feels clean off the club face. Around the green, it has decent control — not tour-level, but not bad for the price. It’s not the kind of ball that “wows” anyone, and some players looking for more spin might want more, but it’s consistent, reliable, and affordable — a combination that earns quiet respect.</p>
     <h4>Performance Highlights:</h4>
@@ -990,9 +1343,9 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
       <tr><td><strong>Ball Flight:</strong></td><td>Mid-high, stable</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Mid handicaps looking for value + performance</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B0B1VCNQ7Y" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
+
 <!-- Callaway Warbird - Budget -->
 <div class="product-card" data-category="budget">
   <img src="{{ url_for('static', filename='images/golf/balls/warbird.jpg') }}" alt="Callaway Warbird" class="product-image">
@@ -1003,8 +1356,18 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
     <img src="{{ url_for('static', filename='images/favicon.png') }}" class="gear-icon" alt="Rating" />
   </div>
   <p><strong>Highlights:</strong>Built for distance and carry — not much spin or feel, but very long.</p>
+  <div class="card-buttons">
   <button class="expand-btn" onclick="toggleDetails(this)">Read Full Summary</button>
-  <div class="product-details" style="display: none;">
+    <div class="buy-menu">
+  <button class="buy-dropdown-btn" onclick="toggleBuyLinks(this)">Where to Buy</button>
+  <div class="buy-links hidden">
+    <a href="https://www.amazon.com/Callaway-Golf-WARBIRD-DIST-12B/dp/B0DHT6RVPZ?crid=1U8OQ3K0MCQZX&dib=eyJ2IjoiMSJ9.LZ8EK_e54oqPJm5uMSDiLJwiAPFrD-_b32N3W5yJLLBWKe0iq9mCvqoQQMn8bB6la1r6nsXJjZ8UTcjELfeum291y9SxEaPbi1LS31CT9_qcuP2aO402uldrU2MebfCLwZ0EeFflh2JNe89O2EASl7O6FjcKZBceew9eX0ldByIdGkTxLUcmkP9e82R8ex-kk5nyHYuUj86nrbq0Q8NvVZRAWZNasO5ZOUGfjTNwDP22powAigOuDrTuI94xzXLI9C3b0CdAYPCQIXa_7_ZUsUEKdMTJOr8p3kK3Zl9uZvQ.9RfX7mVmO6hUO5va0JAncT5pTTR8T3Ljs63ZoFb8P8g&dib_tag=se&keywords=warbird+golf+balls&qid=1747785638&s=sporting-goods&sprefix=warbird+golf+balls%2Csporting%2C112&sr=1-3&linkCode=ll1&tag=worthitgear-20&linkId=01b0d999c03d01698b18d38f8ce7f31a&language=en_US&ref_=as_li_ss_tl" target="_blank">Amazon</a>
+    <!--<a href="https://..." target="_blank">Walmart</a>-->
+    <!-- Add more vendors as needed -->
+  </div>
+</div>
+</div>
+  <div class="product-details">
     <p><strong>WorthIt Rating:</strong> 7.5 / 10</p>
     <p><strong>Worthit Summary:</strong> The Callaway Warbird is built for distance — plain and simple. It’s designed to produce high launch and low spin off the driver, which helps players get the most carry possible, especially with moderate to fast swing speeds. Many golfers report solid ball speed and a strong, consistent flight pattern. The feel is firmer than Callaway’s softer offerings, especially on the green, but for those prioritizing distance above finesse, it’s a reliable choice. It holds up well over multiple rounds and provides a consistent experience for players who want more yardage without stepping up to a tour-level ball.</p>
     <h4>Performance Highlights:</h4>
@@ -1015,7 +1378,6 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
       <tr><td><strong>Ball Flight:</strong></td><td>High and long</td></tr>
       <tr><td><strong>Target Golfer:</strong></td><td>Distance-first players / high handicaps</td></tr>
     </table>
-    <a href="https://www.amazon.com/dp/B07MGPPHFG" target="_blank" class="buy-button">Buy on Amazon</a>
   </div>
 </div>
 
@@ -1080,6 +1442,7 @@ You don’t buy Ultra because it’s fancy — you buy it because it’s $20, it
 
   </footer>
 </div>
+<script async src="//amzn.to/1lR6Iso"></script>
 </body>
 </html>
 
